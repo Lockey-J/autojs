@@ -48,7 +48,7 @@
     var NameiCon=descMatches(/.*个环保证书/).find()
     //var Namei=NameiCon.contentDescription 
     //clickCenter(NameiCon.get(0))。
-    console.log(NameiCon.get(0).parent().children().length);
+    console.log(NameiCon.get(2).parent().children().get(0).contentDescription);
     //log(Namei)
     
     //Waters();
