@@ -11,6 +11,8 @@
         
       };
       function Waters(){
+        var finishWater=threads.disposable();
+
         var to="初始";
         var OutWater=false;
         var thread1=threads.start(function () { events.observeToast();
@@ -18,6 +20,7 @@
                 to=toast.getText();
                 if (to.indexOf("上限")>-1) {
                     OutWater=true;
+                    finishWater.setAndNotify(1)
                     thread1.interrupt();
 
                 }
@@ -25,16 +28,27 @@
         }) ;
         threads.start(function () {while(thread1.isAlive()){
             var selector=descContains("浇水").findOne(2000);
-            console.log(selector);
+            
             // log(OutWater)
             // log(selector && !OutWater)
             if(selector && !OutWater){
-
                 clickCenter(selector)
             }
+        
             sleep(1500);
         }
     })
+        var waitWater=finishWater.blockedGet();
+        if (waitWater=1) {
+            //Back();
+            descContains("返回").findOne(2000).click();
+        }
     }
-      
-    Waters();
+
+    var NameiCon=descMatches(/.*个环保证书/).find()
+    //var Namei=NameiCon.contentDescription 
+    //clickCenter(NameiCon.get(0))。
+    console.log(NameiCon.get(0).parent().children().length);
+    //log(Namei)
+    
+    //Waters();
