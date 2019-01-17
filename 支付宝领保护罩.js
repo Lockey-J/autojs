@@ -4,20 +4,7 @@ var i =0;
 auto();
 function GetWalkNum(){
 
-    app.startActivity({        
-        action: "VIEW",
-        data: "alipays://platformapi/startapp?appId=20000869"    
-    });
-    toast("打开我的行走" );
-    sleep(3000);
-    while( !descContains("我的行走").exists()){
-        sleep(300);
-    }
-    while( !descContains("今日步数").exists()){
-        sleep(300);
-        console.log("今日步数");
-    }
-    toast("已进入我的行走");
+    EnterSP();
     
     sleep(3000);
 
@@ -68,12 +55,15 @@ function GetWalkNum(){
         }else{
             
             toast("步数不足2万，等待刷新……"+"\n\r当前步数："+bushu);
+            sleep(10000);
+            Back();
+            EnterSP();
             ra.swipe(device.width*0.5,device.height*0.2,device.width*0.5,device.height*0.8)
             toast("已刷新，等待10秒加载……"+pd);
-            while(textContains("今日步数").exists()){
+            while(!descContains("今日步数").exists()){
                 sleep(500)
             }            
-            sleep(10000);
+            
         }
     } while (pd<0); 
 }
@@ -154,6 +144,23 @@ function OpenMY(){
         action: "VIEW",
         data: "alipays://platformapi/startapp?appId=60000002"    
     });
+}
+
+function EnterSP(){
+    app.startActivity({        
+        action: "VIEW",
+        data: "alipays://platformapi/startapp?appId=20000869"    
+    });
+    toast("准备进入我的行走" );
+    sleep(3000);
+    while( !descContains("我的行走").exists()){
+        sleep(300);
+    }
+    while( !descContains("今日步数").exists()){
+        sleep(300);
+        console.log("今日步数");
+    }
+    toast("已进入我的行走");
 }
 
 unlock();
