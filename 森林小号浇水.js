@@ -71,16 +71,29 @@ function EnterFriendAnti(obj){
     }
 }
 
-    var FriendList=descMatches(/.*个环保证书/).find()
-    var FriendLength =FriendList.length;
-    FriendList.get(0)
+    // var FriendList=descMatches(/.*个环保证书/).find()
+    // var FriendLength =FriendList.length;
+    // FriendList.get(0)
    
     // log(FriendList.length)
-    var sm=textContains("最新动态").findOne(2000)
-    log(sm)
-    Swipe(sm.bounds().centerX(),sm.bounds().centerY(),sm.bounds().centerX(),sm.bounds().centerY()*0.3,1000)
+    // var sm=textContains("最新动态").findOne(2000)
+    // log(sm)
+
+    //ScrollPHB();
     // EnterFriendAnti(FriendList.get(0));
     //clickCenter(NameiCon)
     //console.log(NameiCon.get(2).parent().children().get(0).contentDescription);  
     //clickCenter(FriendList.get(0))
     //Waters();
+function ScrollPHB(){
+    var sdkint=device.sdkInt;
+    if (sdkint<24){
+        Swipe(device.width*0.5,device.height*0.9,device.width*0.5,device.height*0.1,2000)
+        // sleep(2000)
+        Swipe(device.width*0.5,device.height*0.9,device.width*0.5,device.height*0.5,2000)
+    }else{
+        swipe(device.width*0.5,device.height*0.9,device.width*0.5,device.height*0.1,2000)
+        // sleep(2000)
+        swipe(device.width*0.5,device.height*0.9,device.width*0.5,device.height*0.5,2000)
+    }
+}
