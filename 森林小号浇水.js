@@ -41,14 +41,46 @@
         var waitWater=finishWater.blockedGet();
         if (waitWater=1) {
             //Back();
+            threads.shutDownAll();
             descContains("返回").findOne(2000).click();
         }
     }
 
-    var NameiCon=descMatches(/.*个环保证书/).find()
-    //var Namei=NameiCon.contentDescription 
-    //clickCenter(NameiCon.get(0))。
-    console.log(NameiCon.get(2).parent().children().get(0).contentDescription);
-    //log(Namei)
+function EnterFriendAnti(obj){
+    log(obj)
     
+    if(obj){
+        clickCenter(obj)
+        sleep(2000)
+        while(descContains("稍等片刻").exists()){
+            var czjz=descContains("重新加载").findOne(2000)
+            if(czjz){
+                czjz.click();
+            }
+            log("检测等待字体")
+            sleep(2000)
+        }
+
+    }
+    while(!descContains("浇水").exists()){
+        sleep(1000)
+    }
+    if (descContains("浇水").exists()){
+        log("浇水")
+        Waters();
+    }
+}
+
+    var FriendList=descMatches(/.*个环保证书/).find()
+    var FriendLength =FriendList.length;
+    FriendList.get(0)
+   
+    // log(FriendList.length)
+    var sm=textContains("最新动态").findOne(2000)
+    log(sm)
+    Swipe(sm.bounds().centerX(),sm.bounds().centerY(),sm.bounds().centerX(),sm.bounds().centerY()*0.3,1000)
+    // EnterFriendAnti(FriendList.get(0));
+    //clickCenter(NameiCon)
+    //console.log(NameiCon.get(2).parent().children().get(0).contentDescription);  
+    //clickCenter(FriendList.get(0))
     //Waters();
