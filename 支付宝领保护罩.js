@@ -55,8 +55,9 @@ function GetWalkNum(){
         }else{
             
             toast("步数不足2万，等待刷新……"+"\n\r当前步数："+bushu);
-            sleep(10000);
+            sleep(8000);
             Back();
+            sleep(2000)
             EnterSP();
             ra.swipe(device.width*0.5,device.height*0.2,device.width*0.5,device.height*0.8)
             toast("已刷新，等待10秒加载……"+pd);
