@@ -5,8 +5,6 @@ function OpenMY(){
     });
 }
 function unlock(){
-    
-    
     do {
         device.wakeUp();
         sleep(1000);

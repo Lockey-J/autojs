@@ -1,4 +1,4 @@
-auto();
+
 //点击控件中间位置，兼容6以下root操作跟安卓7以上。
     function clickCenter(obj){
         var rect = obj.bounds();
@@ -11,6 +11,14 @@ auto();
         }
         
       };
+      //支付宝返回到首页
+    function BackZFB(){
+        while(!textContains("首页").exists()){
+            // closePHB();
+            backfun();
+            sleep(1500)
+        }
+    }
 //返回按钮，兼容root跟安卓7
     function backfun(){
         var sdkint=device.sdkInt;
@@ -21,39 +29,45 @@ auto();
             return back();
         }
     }
+    //监听模块
+    function beginToast(){
+        events.observeToast();
+        events.onToast(function(toast){
+            to=toast.getText();
+         
+        });
+    }
       //浇水模块，浇满3次返回
     function Waters(){        
         var finishWater=threads.disposable();
-        log("初始浇水");
-        var to="初始";
+        
         waitWater=0;
        
         var OutWater=false;
        
-        threads.start(function () { 
-            events.observeToast();
-            events.onToast(function(toast){
-                to=toast.getText();
-             
-            });
-        }) ;
+        var thread1= threads.start(beginToast);
+     
+        // thread1.interrupted()
         sleep(1000);
         // var thread2=threads.start(function () {
             while(!OutWater){
             var selector=descContains("浇水").findOne(2000);
             if(descContains("浇水").exists()){
                 // log(OutWater)
-                log(to );
+                log("捕捉提示:"+to );
                 if (to.indexOf("上限")>-1) {
                     log("检测到上限");          
                     OutWater=true;         
                     finishWater.setAndNotify(1);
-                    // thread1.interrupt();
+                    events.removeAllListeners();
+                    // threads.shutDownAll();
+                    break;
 
                 }
-                log(OutWater);
+                log("判断是否浇满3次水："+OutWater);
                 if(selector && !OutWater){
                     log("点击浇水")
+                    log("thread1:"+thread1.isAlive())                
                     clickCenter(selector);
                 }                
                 sleep(1000);
@@ -67,6 +81,7 @@ auto();
             if (to.indexOf("上限")>-1) {        
                 descContains("返回").findOne(2000).click();
                 to="初始"
+                
             };       
         };
            
@@ -85,7 +100,7 @@ function EnterFriendAnti(obj){
     }
     
     if (descContains("浇水").findOne()){
-        log("浇水");
+        log("进入浇水");
         Waters();
     }
 }
@@ -138,17 +153,17 @@ function FinishWater(){
         }
         log("当前账户浇水完毕");
         closePHB();
+        
     }
 
 }
+auto();
+var to="初始";
+// Waters();
 FinishWater();
 // BackZFB()
 //var ss=idContains("item_left_text").find().length
 //log(ss)
-function BackZFB(){
-    while(!textContains("首页").exists()){
-        // closePHB();
-        backfun();
-        sleep(1500)
-    }
-}
+
+// thread2.stop()
+
