@@ -13,6 +13,7 @@
       };
       //支付宝返回到首页
     function BackZFB(){
+        launch("com.eg.android.AlipayGphone");
         while(!textContains("首页").exists()){
             // closePHB();
             backfun();
@@ -46,9 +47,10 @@
         var OutWater=false;
        
         var thread1= threads.start(beginToast);
-     
+        // events.removeAllListeners()
+        // var thread1= threads.start(beginToast);
         // thread1.interrupted()
-        sleep(1000);
+        
         // var thread2=threads.start(function () {
             while(!OutWater){
             var selector=descContains("浇水").findOne(2000);
@@ -92,10 +94,16 @@
 function EnterFriendAnti(obj){
     log(obj)    
     if(obj){
-        sleep(2000);
-        clickCenter(obj);         
-         log("检测是否进入好友蚂蚁森林");
-         descContains("浇水").findOne();        
+        while(!descContains("浇水").exists()){
+            sleep(2000);
+            clickCenter(obj);         
+             log("检测是否进入好友蚂蚁森林");
+             descContains("浇水").findOne(10000); 
+             if(descContains("浇水").exists()){
+                 break;
+             }  
+
+        }          
    
     }
     
@@ -159,11 +167,8 @@ function FinishWater(){
 }
 auto();
 var to="初始";
-// Waters();
+
 FinishWater();
-// BackZFB()
-//var ss=idContains("item_left_text").find().length
-//log(ss)
-
-// thread2.stop()
-
+// threads.shutDownAll();
+// launch("com.eg.android.AlipayGphone");
+// log(currentPackage())
