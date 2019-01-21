@@ -78,7 +78,7 @@ function syncToSamsung(counts){
         sleep(1000);
         sh.exec("am force-stop com.samsung.android.app.health.dataviewer");
         sleep(1000);
-        sh.exit;
+        sh.exit();
       Home();    
      sleep(2000);
    };

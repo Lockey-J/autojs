@@ -18,8 +18,6 @@ function GetWalkNum(){
             var pd=ss-20000;
         }
                    
-    
-
         if (pd>=0 ){
        
             i++;
@@ -36,7 +34,10 @@ function GetWalkNum(){
             while(descContains("加载中").exists()){
                 sleep(300);
             } 
-            sleep(1000);
+            sleep(2000);
+            clickZY();
+            clickBHZ(); 
+            sleep(2000);
             clickZY();
             clickBHZ(); 
             sleep(2000);

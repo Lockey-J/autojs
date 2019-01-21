@@ -11,15 +11,7 @@
         }
         
       };
-      //支付宝返回到首页
-    function BackZFB(){
-        launch("com.eg.android.AlipayGphone");
-        while(!textContains("首页").exists()){
-            // closePHB();
-            backfun();
-            sleep(1500)
-        }
-    }
+
 //返回按钮，兼容root跟安卓7
     function backfun(){
         var sdkint=device.sdkInt;
@@ -35,7 +27,7 @@
         events.observeToast();
         events.onToast(function(toast){
             to=toast.getText();
-         
+            log("来之监听："+to);
         });
     }
       //浇水模块，浇满3次返回
@@ -68,7 +60,7 @@
                 }
                 log("判断是否浇满3次水："+OutWater);
                 if(selector && !OutWater){
-                    log("点击浇水")
+                    toast("点击浇水")
                     log("thread1:"+thread1.isAlive())                
                     clickCenter(selector);
                 }                
@@ -97,9 +89,12 @@ function EnterFriendAnti(obj){
         while(!descContains("浇水").exists()){
             sleep(2000);
             clickCenter(obj);         
-             log("检测是否进入好友蚂蚁森林");
-             descContains("浇水").findOne(10000); 
+            toast("检测是否进入好友蚂蚁森林");
+             descContains("浇水").findOne(5000); 
              if(descContains("浇水").exists()){
+                 if(descContains("重新加载").exists()){
+                    descContains("重新加载").findOne(5000).click();
+                 }
                  break;
              }  
 
@@ -124,7 +119,7 @@ function ScrollPHB(){
         action: "VIEW",
         data: "alipayqr://platformapi/startapp?saId=10000007&" + "clientVersion=3.7.0.0718&qrcode=" + "https://60000002.h5app.alipay.com/www/listRank.html"
        }));
-       log("等待进入蚂蚁森林");
+       toast("等待进入蚂蚁森林");
        idContains("h5_rl_title").findOne();
        idContains("J_rank_list_more").findOne();
        descMatches(/.*个环保证书/).findOne();
@@ -132,18 +127,8 @@ function ScrollPHB(){
        sleep(1000);
 
 }
-//打开蚂蚁森林首页
-function OpenMY(){
-    app.startActivity({        
-        action: "VIEW",
-        data: "alipays://platformapi/startapp?appId=60000002"    
-    });
-    sleep(2000);
-    log("等待进入蚂蚁森林");
-    descContains("合种").findOne();
-    }
 
-
+//完成账号浇水动作
 function FinishWater(){  
     ScrollPHB();
     sleep(5000);
@@ -155,20 +140,105 @@ function FinishWater(){
             FriendList=descMatches(/.*个环保证书/).find();
             var obj=FriendList.get(i);
             log(obj);
-            log("好友："+obj.parent().children().get(1).contentDescription);
+            toast("为好友浇水："+obj.parent().children().get(1).contentDescription);
             EnterFriendAnti(obj.parent());            
             sleep(2000);
         }
-        log("当前账户浇水完毕");
+        toast("当前账户浇水完毕");
         closePHB();
         
     }
+    else{
+        toast("当前账户好友超5个，视为主号")
+        closePHB();
+    }
+
+}
+//进入切换账号界面
+function MutiAccmount(){
+    var sh=new Shell(true)
+    sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.security.accountmanager.ui.AccountManagerActivity_")
+    sh.exit;
+    while(true){
+        var mpage=currentPackage();
+        if(mpage=="com.eg.android.AlipayGphone"){
+            toast("进入支付宝");
+            break;
+        }
+        else{
+            sleep(1000);
+        }
+    } 
+    textContains("账号切换").findOne();
+    var Accmounts=idContains("item_left_text").find();
+    return Accmounts.length;
+
+}
+//切换账号并浇水
+function SwapAccmount(){        
+        var Alength=MutiAccmount();
+    for (var i=0;i<Alength-1;i++){        
+        var Accmounts=idContains("item_left_text").find();        
+        while(true){
+            var chooseAC=Accmounts.get(Alength-2);
+            toast("切换账号："+chooseAC.text());
+           
+            clickCenter(chooseAC);
+            textContains("首页").findOne(3000);
+            if(textContains("首页").exists()){
+                break;
+            }
+            sleep(2000);
+        }
+        FinishWater();
+        if(i<Alength-2){
+            MutiAccmount();
+            sleep(1000);
+        }
+        
+    }
+}
+//打开支付宝
+function ActionZFB(){
+    launch("com.eg.android.AlipayGphone");
+    while(true){
+        var mpage=currentPackage();
+        if(mpage=="com.eg.android.AlipayGphone"){
+            log("进入支付宝");
+            break;
+        }
+        else{
+            sleep(1000);
+        }
+    } 
+}
+function unlock(){
+    do {
+        device.wakeUp();
+        sleep(1000);
+    } while (!device.isScreenOn());
+        //滑动屏幕解锁
+
+    let km =context.getSystemService("keyguard");
+    if (!km.inKeyguardRestrictedInputMode()) {
+    log("屏幕已解锁")
+
+    }else{
+        log("解锁屏幕")
+        ra.swipe(500,700,200,100,100);
+        sleep(1000)
+        toast("解锁屏幕")
+        sleep(2000); 
+    }
+    device.keepScreenDim();
+    device.setBrightnessMode(0);
+    device.setBrightness(50);
 
 }
 auto();
+unlock();
 var to="初始";
-
+ActionZFB();
 FinishWater();
-// threads.shutDownAll();
-// launch("com.eg.android.AlipayGphone");
-// log(currentPackage())
+SwapAccmount();
+threads.shutDownAll();
