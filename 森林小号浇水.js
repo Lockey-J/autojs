@@ -1,4 +1,9 @@
-
+auto();
+unlock();
+var to="初始";
+ActionZFB();
+FinishWater();
+SwapAccmount();
 //点击控件中间位置，兼容6以下root操作跟安卓7以上。
     function clickCenter(obj){
         var rect = obj.bounds();
@@ -119,7 +124,7 @@ function ScrollPHB(){
         action: "VIEW",
         data: "alipayqr://platformapi/startapp?saId=10000007&" + "clientVersion=3.7.0.0718&qrcode=" + "https://60000002.h5app.alipay.com/www/listRank.html"
        }));
-       toast("等待进入蚂蚁森林");
+       toast("等待进入排行榜");
        idContains("h5_rl_title").findOne();
        idContains("J_rank_list_more").findOne();
        descMatches(/.*个环保证书/).findOne();
@@ -152,6 +157,7 @@ function FinishWater(){
         toast("当前账户好友超5个，视为主号")
         closePHB();
     }
+    
 
 }
 //进入切换账号界面
@@ -170,15 +176,20 @@ function MutiAccmount(){
         }
     } 
     textContains("账号切换").findOne();
+    idContains("item_left_text").findOne();
+   
     var Accmounts=idContains("item_left_text").find();
+    log(Accmounts.length)
     return Accmounts.length;
 
 }
 //切换账号并浇水
-function SwapAccmount(){        
+function SwapAccmount(){     
+  
         var Alength=MutiAccmount();
     for (var i=0;i<Alength-1;i++){        
-        var Accmounts=idContains("item_left_text").find();        
+        var Accmounts=idContains("item_left_text").find();     
+      
         while(true){
             var chooseAC=Accmounts.get(Alength-2);
             toast("切换账号："+chooseAC.text());
@@ -195,8 +206,10 @@ function SwapAccmount(){
             MutiAccmount();
             sleep(1000);
         }
-        
+        log(i)
+        log(Alength)
     }
+    threads.shutDownAll();
 }
 //打开支付宝
 function ActionZFB(){
@@ -204,7 +217,7 @@ function ActionZFB(){
     while(true){
         var mpage=currentPackage();
         if(mpage=="com.eg.android.AlipayGphone"){
-            log("进入支付宝");
+        
             break;
         }
         else{
@@ -235,10 +248,5 @@ function unlock(){
     device.setBrightness(50);
 
 }
-auto();
-unlock();
-var to="初始";
-ActionZFB();
-FinishWater();
-SwapAccmount();
-threads.shutDownAll();
+
+
