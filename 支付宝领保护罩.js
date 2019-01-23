@@ -37,6 +37,7 @@ function GetWalkNum(){
             sleep(2000);
             clickZY();
             clickBHZ(); 
+            closeXY();
             sleep(2000);
             clickZY();
             clickBHZ(); 
@@ -56,11 +57,11 @@ function GetWalkNum(){
         }else{
             
             toast("步数不足2万，等待刷新……"+"\n\r当前步数："+bushu);
+            ra.swipe(device.width*0.5,device.height*0.2,device.width*0.5,device.height*0.8)
             sleep(8000);
             Back();
             sleep(2000)
-            EnterSP();
-            ra.swipe(device.width*0.5,device.height*0.2,device.width*0.5,device.height*0.8)
+            EnterSP();            
             toast("已刷新，等待10秒加载……"+pd);
             while(!descContains("今日步数").exists()){
                 sleep(500)
@@ -154,15 +155,12 @@ function EnterSP(){
         data: "alipays://platformapi/startapp?appId=20000869"    
     });
     toast("准备进入我的行走" );
-    sleep(3000);
-    while( !descContains("我的行走").exists()){
-        sleep(300);
-    }
-    while( !descContains("今日步数").exists()){
-        sleep(300);
-        console.log("今日步数");
-    }
+    descContains("我的行走").findOne(5000);
+    descContains("今日步数").findOne(5000);
+    descContains("运动换卡币").findOne(5000);
     toast("已进入我的行走");
+    sleep(3000);
+    
 }
 
 unlock();

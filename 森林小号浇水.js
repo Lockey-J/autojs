@@ -31,7 +31,10 @@ SwapAccmount();
     function beginToast(){
         events.observeToast();
         events.onToast(function(toast){
-            to=toast.getText();
+            var frompackage=toast.getPackageName();
+            if (frompackage=="com.eg.android.AlipayGphone"){
+                to=toast.getText();
+            }
             log("来之监听："+to);
         });
     }
@@ -49,6 +52,7 @@ SwapAccmount();
         // thread1.interrupted()
         
         // var thread2=threads.start(function () {
+            toast("点击浇水")
             while(!OutWater){
             var selector=descContains("浇水").findOne(2000);
             if(descContains("浇水").exists()){
@@ -65,7 +69,7 @@ SwapAccmount();
                 }
                 log("判断是否浇满3次水："+OutWater);
                 if(selector && !OutWater){
-                    toast("点击浇水")
+                    
                     log("thread1:"+thread1.isAlive())                
                     clickCenter(selector);
                 }                
