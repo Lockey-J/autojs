@@ -52,7 +52,7 @@ SwapAccmount();
         // thread1.interrupted()
         
         // var thread2=threads.start(function () {
-            toast("点击浇水")
+            // toast("点 击 浇 水")
             while(!OutWater){
             var selector=descContains("浇水").findOne(2000);
             if(descContains("浇水").exists()){
