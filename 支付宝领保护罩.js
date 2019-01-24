@@ -2,6 +2,16 @@
 var ra = new RootAutomator();
 var i =0;
 auto();
+auto.waitFor();
+unlock();
+sleep(3000)
+GetWalkNum();
+// OpenMY();
+i=0;
+device.setBrightnessMode(1);
+backtoIndex();
+ra.exit();
+//刷新步数方法
 function GetWalkNum(){
 
     EnterSP();
@@ -52,7 +62,9 @@ function GetWalkNum(){
                     sleep(2000);
                 }                
             }
-           
+            ZFBJP();
+            JFSBM();
+            sleep(3000);           
 
         }else{
             
@@ -61,12 +73,12 @@ function GetWalkNum(){
             descContains("我的行走").findOne(5000);
             descContains("今日步数").findOne(5000);
             descContains("运动换卡币").findOne(5000);
-            toast("刷新完毕")
+            toast("已刷新，等待8秒加载……"+pd);
             sleep(8000);
             Back();
             sleep(2000)
             EnterSP();            
-            toast("已刷新，等待10秒加载……"+pd);
+            
             while(!descContains("今日步数").exists()){
                 sleep(500)
             }            
@@ -74,7 +86,7 @@ function GetWalkNum(){
         }
     } while (pd<0); 
 }
-
+//屏幕解锁
 function unlock(){
     
     
@@ -96,12 +108,11 @@ function unlock(){
         sleep(2000);    
    
     
-    }
-    
+    }    
     device.setBrightnessMode(0);
     device.setBrightness(0);
-
 }
+//检测有无比赛须知
 function closeXY(){
     if(desc("返回").exists() && descContains("行走积分赛参赛须知").exists()){
         descContains("返回").findOne().click();
@@ -110,7 +121,6 @@ function closeXY(){
         return true;
     };
     return false;
-
 }
 
 
@@ -120,7 +130,7 @@ function closeFram(){
     };
     sleep(1000);
 }
-
+//点击蚂蚁庄园
 function clickZY(){
     closeFram();
     var swith=parseInt(device.width*0.233);
@@ -133,7 +143,7 @@ function clickZY(){
         sleep(2000);
     }
 }
-
+//点击保护罩
 function clickBHZ(){
     closeFram();
     var swith=parseInt(device.width*0.415);
@@ -145,20 +155,24 @@ function clickBHZ(){
     closeFram();
     i=0;
 }
-
+//打开蚂蚁森林
 function OpenMY(){
     app.startActivity({        
         action: "VIEW",
         data: "alipays://platformapi/startapp?appId=60000002"    
     });
 }
-
+//进入支付宝运动
 function EnterSP(){
     app.startActivity({        
         action: "VIEW",
         data: "alipays://platformapi/startapp?appId=20000869"    
     });
     toast("准备进入我的行走" );
+    sleep(2000);
+    // log(descContains("加载中").findOne())
+ 
+    log("等待加载")
     descContains("我的行走").findOne(5000);
     descContains("今日步数").findOne(5000);
     descContains("运动换卡币").findOne(5000);
@@ -178,21 +192,22 @@ function backfun(){
         return back();
     }
 }
-
+//退出支付宝到首页
 function backtoIndex(){
     var prepackage=currentPackage();
     while(true){
         backfun();
-        sleep(500)
+        sleep(800)
         if(prepackage!=currentPackage()){       
             break;               
         }
 
     }
-    sleep(3000);
+    sleep(6000);
     ActionZFB();
  
 }
+//启动支付宝
 function ActionZFB(){
     launch("com.eg.android.AlipayGphone");
     while(true){
@@ -206,20 +221,19 @@ function ActionZFB(){
         }
     } 
 }
-try {
-    log(descContains("立即捐步").findOne(3000).clickable())
-} catch (error) {
-    log("出错")
+function ZFBJP(){
+    EnterSP();
+    try {
+        var jpBtn=descContains("立即捐步").findOne(3000)
+        jpBtn.click();
+        descContains("即将捐出").findOne(5000);
+        descContains("确定").idContains("J-confirmExchangeBtn").click();
+        descContains("本次捐步").findOne(5000);
+        
+    } catch (error) {
+        return;
+    }
 }
-
-// unlock();
-// sleep(3000)
-// GetWalkNum();
-// OpenMY();
-// i=0;
-// device.setBrightnessMode(1);
-// ra.exit();
-// backtoIndex();
 
 //报名行走积分赛
 function JFSBM(){
