@@ -246,8 +246,7 @@ function unlock(){
         sleep(1000)
         toast("解锁屏幕")
         sleep(2000); 
-    }
-    device.keepScreenDim();
+    }   
     device.setBrightnessMode(0);
     device.setBrightness(50);
 

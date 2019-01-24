@@ -102,7 +102,7 @@ function syncToSamsung(counts){
    
     
     }
-    device.keepScreenDim();
+   
     device.setBrightnessMode(0);
     device.setBrightness(50);
 
