@@ -44,7 +44,7 @@ function GetWalkNum(){
             while(descContains("加载中").exists()){
                 sleep(300);
             } 
-            sleep(2000);
+            sleep(1500);
             clickZY();
             clickBHZ(); 
             closeXY();
