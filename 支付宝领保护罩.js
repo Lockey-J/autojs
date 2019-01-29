@@ -11,9 +11,10 @@ i=0;
 device.setBrightnessMode(1);
 backtoIndex();
 ra.exit();
+
 //刷新步数方法
 function GetWalkNum(){
-
+    var layouttime=40*60*1000
     EnterSP();
     
     sleep(3000);
@@ -133,7 +134,7 @@ function closeFram(){
 //点击蚂蚁庄园
 function clickZY(){
     closeFram();
-    var swith=parseInt(device.width*0.233);
+    var swith=parseInt(device.width*0.245);
     var sheight=parseInt(device.height*0.374);
     ra.press(swith, sheight, 80)    
     toast("屏幕分辨率：("+device.width+","+device.height + ")\r\n      点击：" + "(" +swith +","+sheight+")");

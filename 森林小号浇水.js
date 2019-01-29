@@ -1,3 +1,4 @@
+
 auto();
 unlock();
 var to="初始";
@@ -35,7 +36,7 @@ SwapAccmount();
             if (frompackage=="com.eg.android.AlipayGphone"){
                 to=toast.getText();
             }
-            log("来之监听："+to);
+            log("来之监听："+toast.getText());
         });
     }
       //浇水模块，浇满3次返回
