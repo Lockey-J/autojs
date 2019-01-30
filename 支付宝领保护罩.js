@@ -4,7 +4,8 @@ var i =0;
 auto();
 auto.waitFor();
 unlock();
-sleep(3000)
+sleep(3000);
+syncToSamsung(20000);
 GetWalkNum();
 // OpenMY();
 i=0;
