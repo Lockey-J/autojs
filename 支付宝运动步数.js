@@ -4,13 +4,12 @@ function syncToSamsung(counts){
      log("三星主页")
     launch("com.sec.android.app.shealth");
     sleep(2000)
-      descContains("主页").findOne(8000);
+    descContains("主页").findOne(8000);
     
-      sleep(2000)
-      launch("com.samsung.android.app.health.dataviewer");
-     textContains("三星健康步数管理").waitFor();
-     sleep(1000)
- 
+    sleep(2000)
+    launch("com.samsung.android.app.health.dataviewer");
+    textContains("三星健康步数管理").waitFor();
+    sleep(1000) 
       var re=counts
       while(1){
          if(re<11900){
