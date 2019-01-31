@@ -1,11 +1,16 @@
 
-launch("com.samsung.android.app.health.dataviewer");
-textContains("三星健康步数管理").waitFor();
-var ss=idContains("total_step_count").findOne().text()
-if (ss==""){
+// launch("com.samsung.android.app.health.dataviewer");
+// textContains("三星健康步数管理").waitFor();
+// var ss=idContains("total_step_count").findOne().text()
+// if (ss==""){
    
-}
-log(idContains("total_step_count").findOne().text())
+// }
+// log(idContains("total_step_count").findOne().text())
+
+var sh=new Shell(true)
+sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.nebulacore.ui.H5Activity")
+sh.exitAndWaitFor();
+
 // var sh = new Shell(true);
 // sh.exec("svc wifi disenable")
 // sh.exit();

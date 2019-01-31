@@ -3,7 +3,7 @@ auto();
 unlock();
 var to="初始";
 ActionZFB();
-FinishWater();
+
 SwapAccmount();
 //点击控件中间位置，兼容6以下root操作跟安卓7以上。
     function clickCenter(obj){
@@ -145,7 +145,7 @@ function FinishWater(){
     var FriendList=descMatches(/.*个环保证书/).find();
     var FriendLength =FriendList.length;
     log("当前好友数量："+FriendLength);
-    if(FriendLength<5){
+    if(FriendLength<9){
         for(var i=0;i<FriendLength;i++){
             FriendList=descMatches(/.*个环保证书/).find();
             var obj=FriendList.get(i);
@@ -159,7 +159,7 @@ function FinishWater(){
         
     }
     else{
-        toast("当前账户好友超5个，视为主号")
+        toast("当前账户好友超9个，视为主号")
         closePHB();
     }
     
@@ -169,7 +169,7 @@ function FinishWater(){
 function MutiAccmount(){
     var sh=new Shell(true)
     sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.security.accountmanager.ui.AccountManagerActivity_")
-    sh.exit;
+    sh.exitAndWaitFor();
     while(true){
         var mpage=currentPackage();
         if(mpage=="com.eg.android.AlipayGphone"){
@@ -194,11 +194,11 @@ function SwapAccmount(){
         var Alength=MutiAccmount();
     for (var i=0;i<Alength-1;i++){        
         var Accmounts=idContains("item_left_text").find();     
-      
+        FinishWater();
         while(true){
             var chooseAC=Accmounts.get(Alength-2);
             toast("切换账号："+chooseAC.text());
-           
+            log("切换账号："+chooseAC.text())
             clickCenter(chooseAC);
             textContains("首页").findOne(3000);
             if(textContains("首页").exists()){
@@ -206,7 +206,7 @@ function SwapAccmount(){
             }
             sleep(2000);
         }
-        FinishWater();
+        
         if(i<Alength-2){
             MutiAccmount();
             sleep(1000);
