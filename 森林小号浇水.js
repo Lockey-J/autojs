@@ -1,6 +1,6 @@
 
 auto();
-unlock();
+// unlock();
 var to="初始";
 ActionZFB();
 
@@ -99,7 +99,7 @@ function EnterFriendAnti(obj){
         while(!descContains("浇水").exists()){
             sleep(2000);
             clickCenter(obj);         
-            toast("检测是否进入好友蚂蚁森林");
+            log("检测是否进入好友蚂蚁森林");
              descContains("浇水").findOne(5000); 
              if(descContains("浇水").exists()){
                  if(descContains("重新加载").exists()){
@@ -113,7 +113,8 @@ function EnterFriendAnti(obj){
     }
     
     if (descContains("浇水").findOne()){
-        log("进入浇水");
+        toast("进 行 浇 水");
+        sleep(2000)
         Waters();
     }
 }
@@ -142,6 +143,7 @@ function ScrollPHB(){
 function FinishWater(){  
     ScrollPHB();
     sleep(5000);
+    var friendName;
     var FriendList=descMatches(/.*个环保证书/).find();
     var FriendLength =FriendList.length;
     log("当前好友数量："+FriendLength);
@@ -150,9 +152,16 @@ function FinishWater(){
             FriendList=descMatches(/.*个环保证书/).find();
             var obj=FriendList.get(i);
             log(obj);
-            toast("为好友浇水："+obj.parent().children().get(1).contentDescription);
-            EnterFriendAnti(obj.parent());            
-            sleep(2000);
+            friendName=obj.parent().children().get(1).contentDescription
+            if(friendName.indexOf("大企鹅")>-1){
+                toast("好友黑名单，不浇水");
+                continue;
+            }else{
+                toast("为好友浇水："+obj.parent().children().get(1).contentDescription);
+                EnterFriendAnti(obj.parent());            
+                sleep(2000);
+            }
+          
         }
         toast("当前账户浇水完毕");
         closePHB();
@@ -169,7 +178,7 @@ function FinishWater(){
 function MutiAccmount(){
     var sh=new Shell(true)
     sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.security.accountmanager.ui.AccountManagerActivity_")
-    sh.exitAndWaitFor();
+    // sh.exitAndWaitFor();
     while(true){
         var mpage=currentPackage();
         if(mpage=="com.eg.android.AlipayGphone"){
@@ -177,11 +186,13 @@ function MutiAccmount(){
             break;
         }
         else{
+            log("没有进入支付宝")
             sleep(1000);
         }
     } 
+    log("等待进入")
     textContains("账号切换").findOne();
-    idContains("item_left_text").findOne();
+    textContains("支付宝账号").findOne();
    
     var Accmounts=idContains("item_left_text").find();
     log(Accmounts.length)
@@ -226,6 +237,7 @@ function ActionZFB(){
             break;
         }
         else{
+            log("啥也没")
             sleep(1000);
         }
     } 

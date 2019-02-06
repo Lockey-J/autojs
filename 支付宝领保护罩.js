@@ -141,9 +141,10 @@ function GetWalkNum(){
                 sleep(300);
             } 
             sleep(1500);
+            closeFram();
             clickZY();
             clickBHZ(); 
-            closeXY();
+            closeFram()
             sleep(2000);
             clickZY();
             clickBHZ(); 
@@ -235,8 +236,8 @@ function closeFram(){
 //点击蚂蚁庄园
 function clickZY(){
     closeFram();
-    var swith=parseInt(device.width*0.245);
-    var sheight=parseInt(device.height*0.374);
+    var swith=parseInt(device.width*0.287);
+    var sheight=parseInt(device.height*0.387);
     ra.press(swith, sheight, 80)    
     toast("屏幕分辨率：("+device.width+","+device.height + ")\r\n      点击：" + "(" +swith +","+sheight+")");
     sleep(2000);
@@ -248,7 +249,7 @@ function clickZY(){
 //点击保护罩
 function clickBHZ(){
     closeFram();
-    var swith=parseInt(device.width*0.415);
+    var swith=parseInt(device.width*0.275);
     var sheight=parseInt(device.height*0.545);
     ra.press(swith, sheight, 80)
 
