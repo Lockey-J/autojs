@@ -1,96 +1,981 @@
+"ui";
+//storages.remove("syn_steps")
 
-var ra = new RootAutomator();
-//启用触摸监听
-auto();
-// threads.start(function(){
-//     events.observeTouch();
-//     //注册触摸监听器
-//     events.onTouch(function(p){
-//         //触摸事件发生时, 打印出触摸的点的坐标
-//         log(p.x + ", " + p.y);
-//     });
-// })
-// clickZY();
-clickBHZ();
-function closeFram(){
-    if(descContains("关闭").exists()){
-        descContains("关闭").findOne().click();
-    };
-    sleep(1000);
+var storage = storages.create("syn_steps")
+var config_syn_steps = storage.get("config_syn_steps", {})
+
+var config = {}
+var Accounts2=[]
+var dir = "/sdcard/antForest蚂蚁森林/config_syn_steps.js"
+var timeout=180000
+var stepsMin = 18000
+var date = new Date();
+var now = date.getTime();
+
+console.setGlobalLogConfig({
+    file: "/sdcard/antForest蚂蚁森林/自动同步日志.txt"
+});
+
+log("================================================================================");
+var date = new Date();
+log(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "自动同步运行日志")
+if ((!config_syn_steps.pay) || (!config_syn_steps.deadline) || now > config_syn_steps.deadline) {
+    config_syn_steps.numOfAccounts = 3
 }
-//点击蚂蚁庄园
-function clickZY(){
-    closeFram();
-    var swith=parseInt(device.width*0.287);
-    var sheight=parseInt(device.height*0.387);
-    ra.press(swith, sheight, 80)    
-    toast("屏幕分辨率：("+device.width+","+device.height + ")\r\n      点击：" + "(" +swith +","+sheight+")");
-    sleep(2000);
-    if (descContains("蚂蚁庄园加速卡").exists() && descContains("立即领取").exists()){
-        descContains("立即领取").findOne().click();
-        sleep(2000);
+//toastLog("您的有效期还有" + parseInt((config_syn_steps.deadline - now) / 3600000/24) + "天，请及时联系Mike，以免影响使用")
+if (config_syn_steps.deadline&& (config_syn_steps.deadline-now)/24/3600000<3){
+    toastLog("您的有效期还有" + parseInt(( config_syn_steps.deadline-now) / 3600000)+"小时，请及时联系Mike，以免影响使用")
+}
+
+if (!config_syn_steps.accounts_list) {
+    init_from_file()
+}
+//config_syn_steps.numOfAccounts = 200
+//console.log("账号个数"+config_syn_steps.numOfAccounts );
+
+accounts_list_adjust(config_syn_steps)
+show_syn_steps(config_syn_steps)
+
+
+
+function init_from_old_fast_login() {
+    if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
+        try {
+            let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
+            eval(str)
+            // console.log(config);
+        }
+        catch (err) {
+            toastLog("读取配置文件出错" + err)
+        }
+    } else {
+        toastLog("读取失败，原快捷登录没有配置文件")
+    }
+    return (config)
+}
+function init_from_easy_login() {
+    if (files.isFile("/sdcard/antForest蚂蚁森林/config_easy_login.js")) {
+        try {
+            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_easy_login.js").read(), 11)
+            config_easy_login = eval('(' + str + ')')
+            config_syn_steps.accounts_list = config_easy_login.accounts_list
+            //log(config_syn_steps.accounts_list)
+        }
+        catch(err) {
+            log("读取配置文件出错" + err)
+        } 
+    }
+    else{
+        toastLog("读取失败，没有快捷登录VIP版配置文件")
     }
 }
-//点击保护罩
-function clickBHZ(){
-    closeFram();
-    var swith=parseInt(device.width*0.275);
-    var sheight=parseInt(device.height*0.545);
-    ra.press(swith, sheight, 80)
 
-    toast("屏幕分辨率：("+device.width+","+device.height + ")\r\n      点击：" + "(" +swith +","+sheight+")");
-    sleep(2000);
-    closeFram();
-    i=0;
+function init_from_old_water() {
+    if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
+        try {
+            let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
+            eval(str)
+        }
+        catch (err) {
+            toastLog("读取配置文件出错" + err)
+        }
+    } else {
+        toastLog("读取失败，浇水没有配置文件")
+    }
+    return (config)
+}
+function init_from_water() {
+    if (files.isFile("/sdcard/antForest蚂蚁森林/config_water.js")) {
+        try {
+            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_water.js").read(), 11)
+            config_water = eval('(' + str + ')')
+            accounts_list = config_water.accounts_list
+            for (let i = 0; i < accounts_list.length; i++) {
+                let account = accounts_list[i]
+                if (!account.start_position) {
+                    account.start_position = 1
+                }
+                if (!account.end_position) {
+                    account.end_position = 10
+                }
+                if (!account.gnore) {
+                    account.ignore = ""
+                }
+                if (!account.order) {
+                    account.order = i + 1
+                }
+            }
+            config_syn_steps.accounts_list = accounts_list
+            //log(config_water.accounts_list)
+        }
+        catch (err) {
+            log("读取配置文件出错" + err)
+        }
+    }
+    else {
+        toastLog("读取失败，没有新版同步配置文件")
+    }
+}
+function accounts_list_generation(config, config_syn_steps) {
+    var accounts_list = []
+    let numOfAccounts = config_syn_steps.numOfAccounts
+    //生成accounts_list
+    if (config.options) {
+        let options = config.options
+        for (let i = 0; i < numOfAccounts; i++) {
+            if (options["account" + (i + 1)]) {
+                let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
+                let remark = options["remark" + (i + 1)]
+                // log(remark)
+                account.remark = remark ? remark : ""
+                account.order = i + 1
+                accounts_list.push(account)
+            }
+            else {
+                let account = { account: "", password: "", remark: "", order: i + 1 }
+                accounts_list.push(account)
+            }
+        }
+
+    } else {
+        for (let i = 0; i < numOfAccounts; i++) {
+            let account = { account: "", password: "", remark: "", order: i + 1 }
+            accounts_list.push(account)
+        }
+    }
+    config_syn_steps.accounts_list = accounts_list
+}
+
+//log(files.isFile("/sdcard/alipay/蚂蚁森林/config_syn_steps.js"))
+function init_from_file() {
+    if (files.isFile(dir)) {
+        try {
+            var str = uncompile(open(dir).read(), 11)
+            let config_syn_steps_file = eval('(' + str + ')')
+            let imei_file = config_syn_steps_file.imei ? config_syn_steps_file.imei : "imei"
+            if (imei_file == device.getIMEI()) {
+                config_syn_steps = config_syn_steps_file
+            }
+            else {
+                config_syn_steps.accounts_list = config_syn_steps_file.accounts_list
+                accounts_list_adjust(config_syn_steps)
+            }
+            let accounts_list = config_syn_steps.accounts_list
+            ui.list.setDataSource(accounts_list);
+            saveConfig(dir);
+            toastLog("导入数据成功")
+        }
+        catch (err) {
+            log("读取配置文件出错" + err)
+        }     
+    } else {
+        if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
+            try {
+                let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
+                eval(str)
+                // console.log(config);
+            }
+            catch (err) {
+                log("读取配置文件出错" + err)
+            }
+        } else if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
+            try {
+                let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
+                eval(str)
+            } catch (error) {
+                log("读取配置文件出错" + err)
+            }
+        }
+        var accounts_list = []
+        //log(config0.options)
+       // config_syn_steps.numOfAccounts = config.numOfAccounts ? config.numOfAccounts : 50
+        let numOfAccounts =config_syn_steps.numOfAccounts
+        //生成accounts_list
+        if (config.options) {
+            let options = config.options
+            for (let i = 0; i < numOfAccounts; i++) {
+                if (options["account" + (i + 1)]) {
+                    let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
+                    let remark = options["remark" + (i + 1)]
+                    // log(remark)
+                    account.remark = remark ? remark : ""
+                    account.order = i + 1
+                    accounts_list.push(account)
+                }
+                else {
+                    let account = { account: "", password: "", remark: "", order: i + 1 }
+                    accounts_list.push(account)
+                }
+            }
+
+        } else {
+            for (let i = 0; i < numOfAccounts; i++) {
+                let account = { account: "", password: "", remark: "", order: i + 1 }
+                accounts_list.push(account)
+            }
+        }
+       // log(accounts_list.length)
+        config_syn_steps.accounts_list = accounts_list
+    }
+}
+
+function accounts_list_adjust(config_syn_steps) {
+    let len = config_syn_steps.accounts_list.length
+    let numOfAccounts = config_syn_steps.numOfAccounts
+    if (len < numOfAccounts) {
+        for (let i = len; i < numOfAccounts; i++) {
+            let account = { account: "", password: "", remark: "", order: i + 1 }
+            config_syn_steps.accounts_list.push(account)
+        }
+    }
+    if (len > numOfAccounts) {
+        config_syn_steps.accounts_list = config_syn_steps.accounts_list.slice(0, numOfAccounts)
+    }
+
+}
+
+//log(config_syn_steps.accounts_list)
+
+
+
+//生成remark_list
+function remark_list_update(config_syn_steps) {
+    let accounts_list = config_syn_steps.accounts_list
+    var len = accounts_list.length
+    var row = len % 5 == 0 ? len / 5 : (Math.floor(len / 5) + 1)
+    var remark_list = []
+    var remark_dict = { "remark1": "1", "remark2": "1", "remark3": "1", "remark4": "1", "remark5": "1" }
+    for (let i = 0; i < row; i++) {
+        //let remark_list = { "remark1": "1", "remark2": "1", "remark3": "1", "remark4": "1", "remark5": "1" }
+        var b = Object.assign({}, remark_dict)
+        for (let j = 0; j < 5; j++) {
+            if (i * 5 + j + 1 < len) {
+                let remark = accounts_list[i * 5 + j].remark
+                if (remark && remark != " ") {
+                    b["remark" + (j + 1)] = remark
+                }
+                else {
+                    b["remark" + (j + 1)] = (i * 5 + j + 1)
+                }
+            }
+            else {
+                b["remark" + (j + 1)] = (i * 5 + j + 1)
+            }
+        }
+        remark_list.push(b)
+    }
+    return (remark_list)
+}
+
+function show_syn_steps(config_syn_steps) {
+    ui.layout(
+        <drawer id="drawer">
+            <vertical>
+                <appbar >
+                    <toolbar id="toolbar" title="自动同步" h="32" />
+                    <tabs id="tabs" />
+                </appbar>
+                <viewpager id="viewpager" layout_weight="0.75" h="18">
+                    <frame>
+                        <vertical>  
+                        <vertical layout_weight="0.8">           
+                            <horizontal>
+                                <text h="*" gravity="right|center" size="16" margin="8">  1.从第</text>
+                                <input id="startAccount" inputType="number"  />
+                                <text h="*" gravity="right|center" size="16">个账号开始，到第</text>
+                                <input id="endAccount" inputType="number"  />
+                                <text h="*" gravity="right|center" size="16">个账号结束</text>
+                            </horizontal>
+
+                            <horizontal>
+                                <text textSize="16sp" margin="8">2. 请选择同步刷新方式</text>
+                                <spinner id="sp2" entries="      返回重进|      下拉刷新" />
+                            </horizontal>
+
+                            <text textSize="16sp" margin="8">3. 同步方式</text>
+                            <spinner id="sp3" entries="        自动打开vxp里面的支付宝|        自动打开原始支付宝|        小米摇步专用" />
+
+                            <horizontal>
+                                <text textSize="16sp" margin="8">4. 请选择打开运动的方式</text>
+                                <spinner id="sp4" entries="      方式A|      方式B" />
+                            </horizontal>
+                            <horizontal>
+                                <text textSize="16sp" margin="8">5. 每次同步时在运动等待时间</text>
+                                <spinner id="sp5" entries="        3秒|        5秒|        8秒|        13秒|        21秒|        34秒" />
+                            </horizontal>
+                            <horizontal>
+                                <text textSize="16sp" margin="8">6. 重试次数</text>
+                                <spinner id="sp6" entries="        4秒|        6秒|        9秒" />
+                            </horizontal>
+                            <horizontal>
+                                <text textSize="16sp" margin="8">7. 是否自动捐步</text>
+                                <spinner id="sp7" entries="        否        |        是       " />
+                            </horizontal>
+
+                            
+                            </vertical>
+                        
+                        <linear gravity="center" >
+                            <button id="start" text="开始同步" h="60" w="300" />
+                        </linear>
+                            </vertical>
+                    </frame>
+
+                    <frame>
+                        <vertical>
+                            <list id="list" marginLeft="12" marginRight="10" layout_weight="0.8" >
+
+                                <vertical >
+                                    <horizontal>
+                                        <text textSize="16sp" textColor="#000000" text="{{this.order}}. " /><text id="name" textSize="16sp" textColor="#000000" text="请输入账号{{this.order}}的信息" />
+                                    </horizontal>
+                                    <horizontal>
+                                        <text textSize="16sp" marginLeft="16" textColor="#000000" gravity="right|center" text="账号" />
+                                        <input id="account" hint="请输入账号(必填)" w="220" text="{{this.account}}" />
+                                    </horizontal>
+                                    <horizontal>
+                                        <text textSize="16sp" marginLeft="16" textColor="#000000" gravity="right|center" text="密码" />
+                                        <input id="password" hint="请输入密码(必填)" password="true" w="220" text="{{this.password}}" />
+                                    </horizontal>
+                                    <horizontal>
+                                        <text textSize="16sp" marginLeft="16" textColor="#000000" gravity="right|center" text="备注" />
+                                        <input id="remark" hint="请输入备注(选填)" w="220" text="{{this.remark}}" />
+                                    </horizontal>
+                                    <button id="confirm" text="无需确认" style="Widget.AppCompat.Button" />
+                                </vertical>
+                            </list>
+                            <horizontal gravity="center" >
+                                <button id="save" text="保存配置到文件" w="250" />
+                            </horizontal>
+                        </vertical>
+                    </frame>
+                    <frame>
+                        <vertical >
+                            <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />
+
+                            <text textSize="16sp" textColor="#000000" text="请点击下方的复制IMEI按钮，粘贴发送给Mike(微信1289713124)获取激活码" />
+                            <button id="copy_imei" text="复制IMEI" />
+                            <input id="initialPassword" hint="请输入激活码" w="500" text="" />
+                            <button id="ok" text="确定" />
+                            <button id="init_from_easy_login" text="从快捷登录VIP版导入数据" />
+                            <button id="init_from_water" text="从自动浇水5.x导入数据" />
+                            <button id="init_from_old_fast_login" text="从旧版快捷登陆导入数据" />
+                            <button id="init_from_old_water" text="从旧版自动浇水导入数据" />
+                            <button id="init_from_myself" text="从自身配置文件导入数据" />
+                            <horizontal gravity="center">
+                                <button id="viewlog" text="查看日志" />
+                                <button id="clear_log" text="清除日志" />
+                                <button id="clear" text="清除支付宝缓存" w="150" />
+                            </horizontal>
+                        </vertical>
+                    </frame>
+                </viewpager>
+            </vertical>
+        </drawer>
+    );
+    activity.setSupportActionBar(ui.toolbar);
+    ui.page3.text("每填写或者修改一个账号时，请点击其下方对应的确认按钮，填写或修改完毕再点击最下方的“保存配置到文件”按钮")
+
+    //设置滑动页面的标题
+    ui.viewpager.setTitles(["同步设置", "录入信息", "使用帮助"]);
+    //让滑动页面和标签栏联动
+    ui.tabs.setupWithViewPager(ui.viewpager);
+    //初始化界面
+   let accounts_list = config_syn_steps.accounts_list
+
+
+    ui.list.setDataSource(accounts_list);
+    //ui.button_list.setDataSource(remark_list);
+
+    //页面2
+    ui.list.on("item_click", function (item, i, itemView, listView) {
+        toast("被点击的账号密码为: " + item.password);
+    });
+
+    ui.list.on("item_bind", function (itemView, itemHolder) {
+        //绑定勾选框事件
+        itemView.confirm.on("click", function () {
+            let item = itemHolder.item;
+            item.account = itemView.account.text()
+            item.password = itemView.password.text()
+            item.remark = itemView.remark.text()
+            itemView.confirm.text("已确认修改")
+            //  itemView.confirm.attr("style","Widget.AppCompat.Button.Colored")
+            toast("密码为:" + itemView.password.text())
+            config_syn_steps.accounts_list = accounts_list
+            remark_list = remark_list_update(config_syn_steps)
+            storage.put("config_syn_steps", config_syn_steps)
+        });
+        itemView.password.on("touch_down", function () {
+            itemView.confirm.text("未确认修改,请点击确认")
+        });
+        itemView.account.on("touch_down", function () {
+            itemView.confirm.text("未确认修改,请点击确认")
+        });
+        itemView.remark.on("touch_down", function () {
+            itemView.confirm.text("未确认修改,请点击确认")
+        });
+        //  config_syn_steps.accounts_list=accounts_list
+    });
+
+    var initForm2 = function () {
+        let startAccount = config_syn_steps.startAccount ? config_syn_steps.startAccount:1
+
+        let endAccount = config_syn_steps.endAccount ? config_syn_steps.endAccount : config_syn_steps.numOfAccounts
+        ui.startAccount.text(startAccount + "");
+        ui.endAccount.text(endAccount + "");
+        if (!config_syn_steps.buttons){
+            config_syn_steps.buttons={}
+        }
+        for (let i = 2; i < 8; i++) {
+            let sel = config_syn_steps.buttons["sel" + i] ? config_syn_steps.buttons["sel" + i]:0
+            ui["sp"+i].setSelection(sel)
+        }
+    };
+    initForm2()
+
+    ui.start.click(() => {
+        toastLog("开始同步")
+        config_syn_steps.startAccount = Math.max(1, ui.startAccount.text());
+        config_syn_steps.endAccount = Math.min(ui.endAccount.text(),accounts_list.length);
+      //  config_syn_steps.buttons={}
+        for (let i = 2; i < 8; i++) {
+            config_syn_steps.buttons["sel" + i] = ui["sp"+i].getSelectedItemPosition()          
+        }
+       // log(config_syn_steps.buttons)
+        storage.put("config_syn_steps", config_syn_steps)
+        threads.shutDownAll()
+        threads.start(function () {
+            work(config_syn_steps)
+        })
+    })
+
+     ui.save.click(function () {
+       // ui.button_list.setDataSource(remark_list);
+        saveConfig(dir)
+    })
+    
+    ui.copy_imei.click(function () {
+        let imei = device.getIMEI()
+        setClip(imei)
+        toastLog("本机IMEI为" + imei + "，复制成功")
+    })
+
+    ui.ok.click(() => {
+        // log(ui.initialPassword.text())
+        //  var key=uncompile(uncompile(ui.initialPassword.text()+""))
+        var key = parseInt(uncompile(uncompile(ui.initialPassword.text() + "", 0), 0))
+        key = key + "";
+        var t1 = 9, t2 = 12, t3 = 15
+        if (key.length == 14) {
+            t1 = t1 - 1
+            t2 = t2 - 1
+            t3 = t3 - 1
+        }
+        if (key.length == 13) {
+            t1 = t1 - 2
+            t2 = t2 - 2
+            t3 = t3 - 2
+        }
+        if (key.length == 12) {
+            t1 = t1 - 3
+            t2 = t2 - 3
+            t3 = t3 - 3
+        }
+        if (key.length == 11) {
+            t1 = t1 - 4
+            t2 = t2 - 4
+            t3 = t3 - 4
+        }
+        if (key.length == 16) {
+            t1 = t1 + 1
+            t2 = t2 + 1
+            t3 = t3 + 1
+        }
+        //86611103858332
+        //     log(key)       
+        var date = new Date();
+        var now = date.getTime();
+        var numOfAccounts = (parseInt(key.slice(t1, t2) - 101) * 2);
+        //log(numOfAccounts)
+        var deadline = now + 24 * 3600 * 1000 * parseInt(key.slice(t2, t3));
+        //log("deadline")
+        console.log((deadline-now)/3600000/24);
+
+        var imei = device.getIMEI() + ""
+        if (imei.length == 14) {
+            imei += "" + 0
+        }
+        //log(imei)       
+        var keywordOfTime = Math.floor(key / 1000000) - imei % 1000000000
+        var keyNow = parseInt(((Math.sin(Math.floor(now / 100000000) + 17)) * 1000000000).toString().slice(0, 9))
+        // log(keyNow)
+
+        // log(key.slice(12,15))
+        // log(numOfAccounts)
+        //   log(keywordOfPrime)
+        if (Math.abs(keywordOfTime - keyNow) < 10) {
+            var imei = device.getIMEI();
+            config_syn_steps.imei = imei
+            config_syn_steps.numOfAccounts = numOfAccounts
+            config_syn_steps.pay = true
+            console.log(config_syn_steps.pay);
+
+            config_syn_steps.deadline = deadline
+            toastLog("激活码正确")
+            log("config_syn_steps.deadline" + config_syn_steps.deadline)
+            saveConfig(dir);
+            toastLog("激活成功,重启软件生效!");
+        }
+        else {
+            toastLog("激活码不正确，请联系Mike（微信1289713124）")
+        }
+
+    });
+    ui.init_from_old_fast_login.click(() => {
+        config = init_from_old_fast_login()
+        accounts_list_generation(config, config_syn_steps)
+        accounts_list_adjust(config_syn_steps)
+        let accounts_list = config_syn_steps.accounts_list
+       // let remark_list = remark_list_update(config_syn_steps)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+        try {
+            files.copy("/sdcard/alipay/multimedia/config3.js", "/sdcard/antForest蚂蚁森林/config3.js")
+        } catch (e) {
+            log(e)
+        }
+    })
+
+    ui.init_from_water.click(() => {
+        init_from_water()
+        // accounts_list_generation(config, config_easy_login)
+        accounts_list_adjust(config_syn_steps)
+        let accounts_list = config_syn_steps.accounts_list
+        //let remark_list = remark_list_update(config_easy_login)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+    })   
+    ui.init_from_old_water.click(() => {
+        config = init_from_old_water()
+        accounts_list_generation(config, config_syn_steps)
+        accounts_list_adjust(config_syn_steps)
+        let accounts_list = config_syn_steps.accounts_list
+        //let remark_list = remark_list_update(config_syn_steps)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+        try {
+            files.copy("/sdcard/alipay/multimedia/config.js", "/sdcard/antForest蚂蚁森林/config.js")
+        } catch (e) {
+            log(e)
+        }
+    })
+    ui.init_from_easy_login.click(() => {
+        init_from_easy_login()
+       // accounts_list_generation(config, config_syn_steps)
+        accounts_list_adjust(config_syn_steps)
+        let accounts_list = config_syn_steps.accounts_list
+        //let remark_list = remark_list_update(config_syn_steps)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+    })
+    ui.init_from_myself.click(() => {
+        if (files.isFile(dir)) {
+            try {
+                var str = uncompile(open(dir).read(), 11)
+                let config_syn_steps_file = eval('(' + str + ')')
+                let imei_file = config_syn_steps_file.imei ? config_syn_steps_file.imei:"imei"
+                if (imei_file==device.getIMEI()){
+                    config_syn_steps = config_syn_steps_file
+                }
+                else{
+                    config_syn_steps.accounts_list = config_syn_steps_file.accounts_list
+                    accounts_list_adjust(config_syn_steps)
+                }
+                let accounts_list=config_syn_steps.accounts_list
+                ui.list.setDataSource(accounts_list);
+                saveConfig(dir);
+                toastLog("导入数据成功")
+            }
+            catch (err) {
+                log("读取配置文件出错" + err)
+            }
+        }   
+    })
+
+
+    ui.viewlog.click(()=>{
+        if (files.isFile("/sdcard/antForest蚂蚁森林/自动同步日志.txt")){
+            app.viewFile("/sdcard/antForest蚂蚁森林/自动同步日志.txt");
+        }
+        else{
+            toastLog("没有日志文件")
+        }  
+    })
+    ui.clear_log.click(() => {
+        confirm("确定清除历史日志?").then(value => {
+            if (value) {
+                files.remove("/sdcard/antForest蚂蚁森林/自动同步日志.txt")
+                toastLog("清除日志成功")
+            }
+        })
+    })
+    ui.clear.click(() => {
+        app.openAppSetting("com.eg.android.AlipayGphone")
+        toastLog("请手动清除支付宝全部数据,然后手动登录一个账号")
+    })
+
+}
+
+function saveConfig(dir) {
+    //config_syn_steps.sp1 = ui.sp1.getSelectedItemPosition()
+    storage.put("config_syn_steps", config_syn_steps)
+    let str = JSON.stringify(config_syn_steps)
+    //log(config_syn_steps.remark_list)
+    try {
+        files.ensureDir(dir)
+        var file = open(dir, "w");
+        file.write(compile(str, 11));
+        file.close();
+        toastLog("保存设置成功")
+    }
+    catch (err) {
+        console.log("错误" + err);
+        toastLog("保存设置到文件失败")
+    }
+}
+function compile(code, num) {
+    var c = String.fromCharCode(code.charCodeAt(0) + code.length);
+    for (var i = 1; i < code.length; i++) {
+        c += String.fromCharCode(code.charCodeAt(i) + code.charCodeAt(i - 1) + num);
+    }
+    return (escape(c))
+}
+
+function uncompile(code, num) {
+    code = unescape(code);
+    var c = String.fromCharCode(code.charCodeAt(0) - code.length);
+    for (var i = 1; i < code.length; i++) {
+        c += String.fromCharCode(code.charCodeAt(i) - c.charCodeAt(i - 1) - num);
+    }
+    return c;
+}
+
+//////浇水函数部分：
+///函数部分
+function work(config_syn_steps) {
+
+    let buttons = config_syn_steps.buttons
+  //  log(buttons)
+    console.show()
+   // console.log(config_syn_steps);
+    let startAccount = config_syn_steps.startAccount 
+    let endAccount = config_syn_steps.endAccount
+    let Accounts = config_syn_steps.accounts_list.slice(startAccount-1,endAccount)
+   // log(Accounts)
+    auto.waitFor()
+    work_pre(); //登陆vxp
+    console.setPosition(0,device.height/2);
+    let sel3 = config_syn_steps.buttons.sel3  
+    if(sel3==2){
+        syn_steps_xiaomi(Accounts)
+    }
+    else{
+        syn_steps_accounts(Accounts);
+        if (Accounts2.length > 0) {
+            log("=============================")
+            log("正在重试失败的账号...")
+            syn_steps_accounts(Accounts2);
+        }
+    }
+    app.startActivity("console");
+}
+function work_pre() {
+    let sel3 = config_syn_steps.buttons.sel3
+   // console.log(sel3);  
+    if (sel3 == 0) {
+        appName = "io.va.exposed";
+        launch(appName);
+        sleep(500)
+        textContains("支付宝").waitFor();
+        sleep(200)
+        click("支付宝");
+    }
+}
+
+function syn_steps_xiaomi(Accounts) {
+    let sel3 = config_syn_steps.buttons.sel3
+    for (let kk = 0; kk < Accounts.length; kk++) {
+        account = Accounts[kk]
+        switchAccount(account.account, account.password, 1);
+        log("已成功登录到第" + account.order + "个账号")
+        let obj=textMatches(/.*(步数排行榜更新了|快去捐步).*/).findOne(8000)
+        if(obj){
+            let obj_time =obj.parent().child(2) 
+           // log(obj_time)
+            let time_text = obj_time ? obj_time.text():"未找到时间"
+            if (time_text.indexOf("刚刚") > -1 || time_text.indexOf("分钟") > -1){
+                toastLog("步数刷新成功")
+            }
+            else if (time_text.indexOf("小时") > -1){
+                time_hours = parseInt(time_text)
+                let data=new Date()
+                let h=data.getHours()
+                if (time_hours<h){
+                    toastLog("步数刷新成功")
+                }
+            }
+            else{
+                console.error("步数刷新可能失败，请检查")
+            }      
+        }
+        else {
+            console.error("步数刷新可能失败，请检查")
+        }     
+    }
+}
+
+function syn_steps_accounts(Accounts) {
+    //let sel3 = config_syn_steps.buttons.sel3
+    for (let kk = 0; kk <Accounts.length; kk++) {
+        account = Accounts[kk]       
+        switchAccount(account.account, account.password, 1);
+        log("已成功登录到第" + account.order+ "个账号")
+        let steps_real=syncToAlipay();
+        //log("steps_real"+steps_real)
+        if (steps_real< stepsMin) {
+            try {
+                if (Accounts2.indexOf(account) < 0) {
+                    Accounts2.push(account)
+                    log("支付宝步数为" + steps_real + ",同步失败,已添加到重试名单")
+                }
+                else {
+                    console.error("支付宝步数为" + steps_real + ",同步失败,请稍后重试")
+                }               
+            
+            } catch (error) {
+                console.log(error);               
+            }
+        }
+    }
 }
 
 
+function syncToAlipay() {
+    let sel3=config_syn_steps.buttons.sel3
+    let sel2 = config_syn_steps.buttons.sel2
+    let sel4 = config_syn_steps.buttons.sel4
+   // log("sel2="+sel2)
+    let sel5 = config_syn_steps.buttons.sel5
+    let trytimes=[4,6,9]
+    let sel6 = config_syn_steps.buttons.sel6
+    let sel7 = config_syn_steps.buttons.sel7
+    let steps=0
+    //let timeout = config_syn_steps.timeout
+    go_sports(sel3,sel4) 
+    for (var i = 0; i < trytimes[sel6]; i++) {
+        desc("今日步数").findOne()
+        timestop=[3,5,8,13,21,34]
+        sleep(500)
+        sleep(timestop[sel5] * 1000 / 2)
+        w = descMatches(/^\d+(,\d{3})*$/).findOne();
+        var steps_alipay = w.contentDescription
+        while (1) {
+            sleep(200)
+            w = descMatches(/^\d+(,\d{3})*$/).findOne();
+            if (steps_alipay == w.contentDescription) {
+                break;
+            }
+            else {
+                steps_alipay = w.contentDescription
+            }
+        }
+        let steps_real = steps_alipay.replace(/,/g, '');
+        // log(steps_alipay)
+       // log(steps_real)
+        steps=steps_real
+        if (steps_real >= stepsMin) {
+            toastLog("支付宝步数为" + steps_real + ",同步成功")
+            if (sel7 == 1) {
+                var 捐步 = desc("立即捐步").findOnce()
+                if (捐步) {
+                    捐步.click()
+                    var 确定 = desc("确定").findOne(2000)
+                    if (确定) {
+                        确定.click()
+                        sleep(1000)
+                        log("捐步成功")
+                        back()
+                        sleep(1000)
+                    }
+                }
+            }
+            break;
+        }
+        if (sel2==0) {
+            back();
+            text("首页").findOne()
+            sleep(1000)
+            let sel3=config_syn_steps.buttons.sel3
+            let sel4 = config_syn_steps.buttons.sel4
+            go_sports(sel3,sel4)
+        }else{
+            swipe(device.width / 9 * 8, device.height / 3, device.width / 9 * 8, device.height / 3 * 2, 500)
+            sleep(2000);
+        }      
+        sleep(timestop[sel5] * 1000/2)
+    }
+    sleep(500)
+    back()
+    return(steps)
+}
 
+function go_sports(sel3,sel4){
 
-// launch("com.samsung.android.app.health.dataviewer");
-// textContains("三星健康步数管理").waitFor();
-// var ss=idContains("total_step_count").findOne().text()
-// if (ss==""){
-   
-// }
-// log(idContains("total_step_count").findOne().text())
+    if (sel3 == 1 && sel4==0) {
+       // log("直接跳转")
+        app.startActivity({
+            data: "alipayqr://platformapi/startapp?saId=20000869"
+        })
+    }
+    else {
+        while (1) {
+            var obj = idContains("app_text").text("运动").findOne();
+            var sportButton = obj.parent()
+            if (sportButton) {
+                break;
+            }
+        }
+        sleep(500)
+        clickCenter(obj)
+        sportButton.click()
+       // sleep(200)
+        
+    }
+    desc("今日步数").findOne()
+}
 
-// var sh=new Shell(true)
-// sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.nebulacore.ui.H5Activity")
-// sh.exitAndWaitFor();
+function clickCenter(obj) {
+    let b=obj.bounds()
+    return(click(b.centerX(),b.centerY()))
+}
 
-// var sh = new Shell(true);
-// sh.exec("svc wifi disenable")
-// sh.exit();
+function switchAccount(account,key,sel) {
+    this.logIn = function (account, key) {
+        idContains("loginButton").waitFor()
+        setText(0, account);
+        sleep(100);
+        setText(1, key);
+        //   log("设置密码")
+        sleep(100);
+        setText(0, account);
+        idContains("loginButton").findOne().click()
+        text("首页").findOne()
+    }
+    if(sel==0) {
+        var my = idContains("tab_description").text("我的").findOne();
+        my.parent().click()
+        clickCenter(my);
+        text("设置").waitFor();
+        var a = account;
+        var b = idContains("user_account").findOne().text()
+        // log(a+";"+b)
+        if (a == b || (a.indexOf("@") < 0 && a.slice(0, 3) == b.slice(0, 3) && a.slice(a.length - 2, a.length) == b.slice(b.length - 2, b.length))) {
+            while (!click("首页"));
+            text("蚂蚁森林").waitFor();
+            // sleep(1000);
+        }
+        else {
+            //  log("查找设置")
+            //   while(!click("设置"));
+            //  while(!(my.parent().click()&&clickCenter(my)));
+            desc("设置").findOne().click()
+            var accountManage = textMatches(/账号管理|账户详情|换账号登录/).findOne().text()
+            // sleep(500)
+            if (accountManage == "账号管理" || accountManage == "账户详情") {
+                click("账户详情") 
+                click("账号管理")
+                threads.start(function () {
+                    sleep(3000)
+                    var obj
+                    if (obj = descMatches(/账号管理|账户详情|换账号登录/).findOne(1000)) {
+                        clickCenter(obj)
+                    }
+                })
+                text("账号切换").waitFor()
+                //   sleep(500);
+                click("账号切换") 
+            } else {
+                text("换账号登录").waitFor()
+                //   sleep(500);
+                click("换账号登录") 
+            }
+            var obj = textContains("换个新账号登录").findOne()
+            click("换个新账号登录") 
+            clickCenter(obj) ;
+            var obj = textMatches(/点击下方头像登录|登录|下一步/).findOne().text()
+            if (obj == "点击下方头像登录") {
+                text("换个账号").findOne().click()
+                //    sleep(500)
+                var obj = textMatches(/登录|下一步/).findOne().text()
+                //     sleep(300)
+            }
+            if (obj == "下一步") {
+                //   textContains("下一步").waitFor()
+                sleep(100)
+                setText(0, account);
+                sleep(100)
+                click("下一步")
+                // sleep(1000)
+                var obj = textMatches(/登录|刷脸登录/).findOne().text()
+                if (obj == "登录") {
+                    //  log("登录")
+                    sleep(100);
+                    setText(1, key);
 
+                } else {
+                    //  log("刷脸登录")
+                    sleep(200)
+                    textMatches(/换个验证方式|换个方式登录/).findOne()
+                    click("换个验证方式")
+                    click("换个方式登录")
+                    text("密码登录").findOne()
+                    //  text("密码登录").findOne().parent().click()
+                    sleep(200)
+                    while (!click("密码登录")) { }
+                    sleep(400)
+                    setText(0, account);
+                    sleep(200);
+                    setText(1, key);
+                    sleep(200)
+                }
+                idContains("loginButton").findOne().click()
+                text("首页").waitFor();
+            } else {
+                this.logIn(account, key)
+            }
+        }   
+    }
+    else{
+        app.startActivity(app.intent({
+            action: "VIEW",
+            data: "alipayqr://platformapi/startapp?appId=20000008",
+        }));
+        threads.start(function () {
+            obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(5000)
+            click("密码登录")
+            click("换个验证方式")
+            click("换个方式登录")
+        })
+        this.logIn(account, key)
+    }
+}
 
-// auto();
-// importClass('java.net.Inet4Address');
-// importClass('java.net.InetAddress');
-// importClass('java.net.NetworkInterface');
-// importClass('java.util.Enumeration');
-// importClass('java.net.Inet6Address');
-// //获取内网IP地址
-// var hostIp = null;
-// try{
-//     var nis = NetworkInterface.getNetworkInterfaces();
-//     var ia = null;
-//     while (nis.hasMoreElements()) {
-//         var ni = nis.nextElement();
-//         var ias = ni.getInetAddresses();
-//         while (ias.hasMoreElements()) {  
-//             ia = ias.nextElement();  
-//             if (ia instanceof Inet6Address) {
-//                 continue;
-//             }
-//             var ip = ia.getHostAddress();
-//             if (!"127.0.0.1".equals(ip)) {
-//                 hostIp = ia.getHostAddress();
-//                 break;
-//             }
-//         }
-//     }
-// } catch (e) {
-//     log(e);
-// }
-// log(hostIp);
