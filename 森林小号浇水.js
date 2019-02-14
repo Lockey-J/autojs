@@ -1,10 +1,11 @@
 
 auto();
+var sh=new Shell(true);
 unlock();
 var to="初始";
 ActionZFB();
-
 SwapAccmount();
+sh.exit();
 exit();
 toast("浇水结束");
 log("浇水结束");
@@ -182,9 +183,9 @@ function FinishWater(){
 //进入切换账号界面
 function MutiAccmount(){
     log("进入切换账号界面")
-    var sh=new Shell(true)
+    
     sh.exec("am start com.eg.android.AlipayGphone/com.alipay.mobile.security.accountmanager.ui.AccountManagerActivity_")
-    sh.exitAndWaitFor();
+    
     while(true){
         var mpage=currentPackage();
         if(mpage=="com.eg.android.AlipayGphone"){

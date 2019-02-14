@@ -1,5 +1,6 @@
 //行走积分赛领保护套脚本
 var ra = new RootAutomator();
+var sh = new Shell(true);
 var i =0;
 auto();
 auto.waitFor();
@@ -11,6 +12,7 @@ GetWalkNum();
 i=0;
 device.setBrightnessMode(1);
 backtoIndex();
+sh.exit();
 ra.exit();
 //三星健康刷步数
 function syncToSamsung(counts){
@@ -97,12 +99,12 @@ function syncToSamsung(counts){
       else{console.error("三星健康步数为"+current_steps+",同步失败,请重试")}
     //  console.show();
       sleep(1000)  
-        var sh = new Shell(true);
+        
         sh.exec("am force-stop com.sec.android.app.shealth");
         sleep(1000);
         sh.exec("am force-stop com.samsung.android.app.health.dataviewer");
         sleep(1000);
-        sh.exitAndWaitFor();
+        
         Home();    
         sleep(2000);
    };

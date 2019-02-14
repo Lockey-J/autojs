@@ -33,7 +33,7 @@ function CloseZFB(){
     var sh = new Shell(true);
     sh.exec("am force-stop com.eg.android.AlipayGphone");
     sleep(2000);
-    sh.exit;
+    sh.exit();
 }
 auto();
 unlock();
