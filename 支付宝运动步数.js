@@ -1,3 +1,8 @@
+var sh = new Shell(true);
+auto();
+unlock();
+syncToSamsung(20000);
+sh.exit();
 function syncToSamsung(counts){
     var sjs=Math.round(Math.random()*2000)
     counts=counts+sjs
@@ -72,12 +77,12 @@ function syncToSamsung(counts){
       else{console.error("三星健康步数为"+current_steps+",同步失败,请重试")}
     //  console.show();
       sleep(1000)  
-        var sh = new Shell(true);
+        
         sh.exec("am force-stop com.sec.android.app.shealth");
         sleep(1000);
         sh.exec("am force-stop com.samsung.android.app.health.dataviewer");
         sleep(1000);
-        sh.exit();
+        
       Home();    
      sleep(2000);
    };
@@ -106,6 +111,3 @@ function syncToSamsung(counts){
     device.setBrightness(50);
 
 }
-  auto();
-  unlock();
-  syncToSamsung(20000);
