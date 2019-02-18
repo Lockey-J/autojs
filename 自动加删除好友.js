@@ -18,7 +18,7 @@ log("===========================================");
 var date = new Date();
 log(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "加删好友运行日志")
 if ((!config_friends_manager.pay) || (!config_friends_manager.deadline) || now > config_friends_manager.deadline) {
-    config_friends_manager.numOfAccounts = 3
+    config_friends_manager.numOfAccounts = 100
     config_friends_manager.remainTimes=50
 }
 if (config_friends_manager.deadline && (config_friends_manager.deadline - now)/ 24 / 3600000  < 1) {
@@ -319,13 +319,9 @@ function show_friends_manager(config_friends_manager) {
                         <vertical >
                             <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />
 
-                            <text textSize="16sp" textColor="#000000" text="请点击下方的复制IMEI按钮，粘贴发送给Mike(微信*******)获取激活码" />
-                            <button id="copy_imei" text="复制IMEI" />
-                            <input id="initialPassword" hint="请输入激活码" w="500" text="" />
-                            <button id="ok" text="确定" />
-                            <button id="init_from_old_fast_login" text="从原快捷登陆导入数据" />
-                            <button id="init_from_water" text="从自动浇水导入数据" />
-                            <button id="init_from_easy_login" text="从快捷登录VIP版导入数据" />
+                            
+                          
+                            
                             <button id="viewlog" text="查看日志" />
                         </vertical>
                     </frame>
@@ -440,160 +436,118 @@ function show_friends_manager(config_friends_manager) {
         saveConfig(dir)
     })
 
-    ui.copy_imei.click(function () {
-        let imei = device.getIMEI()
-        setClip(imei)
-        toastLog("本机IMEI为" + imei + "，复制成功")
-    })
+    // ui.copy_imei.click(function () {
+    //     let imei = device.getIMEI()
+    //     setClip(imei)
+    //     toastLog("本机IMEI为" + imei + "，复制成功")
+    // })
 
-    ui.ok.click(() => {
-        // log(ui.initialPassword.text())
-        //  var key=uncompile(uncompile(ui.initialPassword.text()+""))
-        var key = parseInt(uncompile(uncompile(ui.initialPassword.text() + "", 0), 0))
-        key = key + "";
-        var t1 = 9, t2 = 13, t3 = 17
-        if (key.length == 17) {
-            t1 = t1 - 1
-            t2 = t2 - 1
-            t3 = t3 - 1
-        }
-        if (key.length == 16) {
-            t1 = t1 - 2
-            t2 = t2 - 2
-            t3 = t3 - 2
-        }
-        if (key.length == 15) {
-            t1 = t1 - 3
-            t2 = t2 - 3
-            t3 = t3 - 3
-        }
-        if (key.length == 14) {
-            t1 = t1 - 4
-            t2 = t2 - 4
-            t3 = t3 - 4
-        }
-        if (key.length == 19) {
-            t1 = t1 + 1
-            t2 = t2 + 1
-            t3 = t3 + 1
-        }
-        //86611103858332
-       // log(key)       
-        var date = new Date();
-        var now = date.getTime();
-        var numOfAccounts = 2*6;
-        //log(key.slice(t1, t2))
-        //log('t1','t2')
-        //log(t1)
-       // log(t2)
-        //log(numOfAccounts)
+    // ui.ok.click(() => {
+    //     // log(ui.initialPassword.text())
+    //     //  var key=uncompile(uncompile(ui.initialPassword.text()+""))
+    //     var key = parseInt(uncompile(uncompile(ui.initialPassword.text() + "", 0), 0))
+    //     key = key + "";
+    //     var t1 = 9, t2 = 13, t3 = 17
+    //     if (key.length == 17) {
+    //         t1 = t1 - 1
+    //         t2 = t2 - 1
+    //         t3 = t3 - 1
+    //     }
+    //     if (key.length == 16) {
+    //         t1 = t1 - 2
+    //         t2 = t2 - 2
+    //         t3 = t3 - 2
+    //     }
+    //     if (key.length == 15) {
+    //         t1 = t1 - 3
+    //         t2 = t2 - 3
+    //         t3 = t3 - 3
+    //     }
+    //     if (key.length == 14) {
+    //         t1 = t1 - 4
+    //         t2 = t2 - 4
+    //         t3 = t3 - 4
+    //     }
+    //     if (key.length == 19) {
+    //         t1 = t1 + 1
+    //         t2 = t2 + 1
+    //         t3 = t3 + 1
+    //     }
+    //     //86611103858332
+    //    // log(key)       
+    //     var date = new Date();
+    //     var now = date.getTime();
+    //     var numOfAccounts = 2*6;
+    //     //log(key.slice(t1, t2))
+    //     //log('t1','t2')
+    //     //log(t1)
+    //    // log(t2)
+    //     //log(numOfAccounts)
         
-        //log(payByMonth)
-        //console.log(deadline);
-       // aa = parseInt((Math.sin((Math.floor(now / 100000000)) + 19) * 1000000000).toString().slice(0, 9))
-        //bb = Imei.slice(6, 15) % 1000000000
-        //var key0 = aa + bb + "" + (1001 + parseInt(numberOfAccounts)).toString() + "" + validity + '' + (payByMonth + 0)
+    //     //log(payByMonth)
+    //     //console.log(deadline);
+    //    // aa = parseInt((Math.sin((Math.floor(now / 100000000)) + 19) * 1000000000).toString().slice(0, 9))
+    //     //bb = Imei.slice(6, 15) % 1000000000
+    //     //var key0 = aa + bb + "" + (1001 + parseInt(numberOfAccounts)).toString() + "" + validity + '' + (payByMonth + 0)
 
-        var imei = device.getIMEI() + ""
-        if (imei.length == 14) {
-            imei += "" + 0
-        }
-        //log(imei)       
-        var keywordOfTime = Math.floor(parseInt(key) / 1000000000) - parseInt(imei) % 1000000000
-        var keyNow = parseInt(((Math.sin(Math.floor(now / 100000000) + 19)) * 1000000000).toString().slice(0, 9))
-        //log(keyNow)
-        //log(keywordOfTime)
+    //     var imei = device.getIMEI() + ""
+    //     if (imei.length == 14) {
+    //         imei += "" + 0
+    //     }
+    //     //log(imei)       
+    //     var keywordOfTime = Math.floor(parseInt(key) / 1000000000) - parseInt(imei) % 1000000000
+    //     var keyNow = parseInt(((Math.sin(Math.floor(now / 100000000) + 19)) * 1000000000).toString().slice(0, 9))
+    //     //log(keyNow)
+    //     //log(keywordOfTime)
 
-        // log(key.slice(12,15))
-        // log(numOfAccounts)
-        //   log(keywordOfPrime)
-        if (true) {
-            toastLog("开始破解")
-            var payByMonth = key[t3]
-            var imei = device.getIMEI();
-            config_friends_manager.imei = imei
-            config_friends_manager.numOfAccounts = numOfAccounts
-            config_friends_manager.payByMonth = payByMonth
-            config_friends_manager.pay=true
-            if (true) {
-                var deadline = now + 24 * 3600 * 1000 * 7;
-                config_friends_manager.deadline=deadline
-                config_friends_manager.remainTimes += numOfAccounts*60
-            }
-            else{
-                config_friends_manager.deadline=deadline
-                config_friends_manager.remainTimes += numOfAccounts*60
-            }
-            //log(config_friends_manager)
-            saveConfig(dir);
-            toastLog("破解成功,重启软件生效!");
-        }
-        else {
-            toastLog("激活码正确")
-            var payByMonth = key[t3]
-            var imei = device.getIMEI();
-            config_friends_manager.imei = imei
-            config_friends_manager.numOfAccounts = numOfAccounts
-            config_friends_manager.payByMonth = payByMonth
-            config_friends_manager.pay=true
-            if (true) {
-                var deadline = now + 24 * 3600 * 1000 * 7;
-                config_friends_manager.deadline=deadline
-                config_friends_manager.remainTimes += numOfAccounts*60
-            }
-            else{
-                config_friends_manager.deadline=deadline
-                config_friends_manager.remainTimes += numOfAccounts*60
-            }
-            //log(config_friends_manager)
-            saveConfig(dir);
-            toastLog("激活成功,重启软件生效!");
-        }
+    //     // log(key.slice(12,15))
+    //     // log(numOfAccounts)
+    //     //   log(keywordOfPrime)
+    //     if (true) {
+    //         toastLog("开始破解")
+    //         var payByMonth = key[t3]
+    //         var imei = device.getIMEI();
+    //         config_friends_manager.imei = imei
+    //         config_friends_manager.numOfAccounts = numOfAccounts
+    //         config_friends_manager.payByMonth = payByMonth
+    //         config_friends_manager.pay=true
+    //         if (true) {
+    //             var deadline = now + 24 * 3600 * 1000 * 7;
+    //             config_friends_manager.deadline=deadline
+    //             config_friends_manager.remainTimes += numOfAccounts*60
+    //         }
+    //         else{
+    //             config_friends_manager.deadline=deadline
+    //             config_friends_manager.remainTimes += numOfAccounts*60
+    //         }
+    //         //log(config_friends_manager)
+    //         saveConfig(dir);
+    //         toastLog("破解成功,重启软件生效!");
+    //     }
+    //     else {
+    //         toastLog("激活码正确")
+    //         var payByMonth = key[t3]
+    //         var imei = device.getIMEI();
+    //         config_friends_manager.imei = imei
+    //         config_friends_manager.numOfAccounts = numOfAccounts
+    //         config_friends_manager.payByMonth = payByMonth
+    //         config_friends_manager.pay=true
+    //         if (true) {
+    //             var deadline = now + 24 * 3600 * 1000 * 7;
+    //             config_friends_manager.deadline=deadline
+    //             config_friends_manager.remainTimes += numOfAccounts*60
+    //         }
+    //         else{
+    //             config_friends_manager.deadline=deadline
+    //             config_friends_manager.remainTimes += numOfAccounts*60
+    //         }
+    //         //log(config_friends_manager)
+    //         saveConfig(dir);
+    //         toastLog("激活成功,重启软件生效!");
+    //     }
 
-    });
-    ui.init_from_old_fast_login.click(() => {
-        config = init_from_old_fast_login()
-        accounts_list_generation(config, config_friends_manager)
-        accounts_list_adjust(config_friends_manager)
-        let accounts_list = config_friends_manager.accounts_list
-        // let remark_list = remark_list_update(config_friends_manager)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-        try {
-            files.copy("/sdcard/alipay/multimedia/config3.js", "/sdcard/antForest蚂蚁森林/config3.js")
-        } catch (e) {
-            log(e)
-        }
-    })
-    ui.init_from_water.click(() => {
-        config = init_from_water()
-        accounts_list_generation(config, config_friends_manager)
-        accounts_list_adjust(config_friends_manager)
-        let accounts_list = config_friends_manager.accounts_list
-        //let remark_list = remark_list_update(config_friends_manager)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-        try {
-            files.copy("/sdcard/alipay/multimedia/config.js", "/sdcard/antForest蚂蚁森林/config.js")
-        } catch (e) {
-            log(e)
-        }
-    })
-    ui.init_from_easy_login.click(() => {
-        init_from_easy_login()
-        // accounts_list_generation(config, config_friends_manager)
-        accounts_list_adjust(config_friends_manager)
-        let accounts_list = config_friends_manager.accounts_list
-        //let remark_list = remark_list_update(config_friends_manager)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-    })
+    // });
+    // 
     ui.viewlog.click(() => {
         if (files.isFile("/sdcard/antForest蚂蚁森林/加删好友日志.txt")) {
             app.viewFile("/sdcard/antForest蚂蚁森林/加删好友日志.txt");
