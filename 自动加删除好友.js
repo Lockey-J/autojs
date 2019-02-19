@@ -17,16 +17,7 @@ console.setGlobalLogConfig({
 log("===========================================");
 var date = new Date();
 log(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "加删好友运行日志")
-if ((!config_friends_manager.pay) || (!config_friends_manager.deadline) || now > config_friends_manager.deadline) {
     config_friends_manager.numOfAccounts = 100
-    config_friends_manager.remainTimes=50
-}
-if (config_friends_manager.deadline && (config_friends_manager.deadline - now)/ 24 / 3600000  < 1) {
-    toastLog("您的有效期还有" + parseInt((config_friends_manager.deadline - now) / 3600000) + "小时，请及时联系Mike，以免影响使用")
-}
-if (config_friends_manager.remainTimes && (config_friends_manager.remainTimes ) < 10) {
-    toastLog("您的次数还剩" + config_friends_manager.remainTimes+ "次，请及时联系Mike，以免影响使用")
-}
 
 if (!config_friends_manager.accounts_list) {
     init_from_file()
@@ -40,51 +31,7 @@ accounts_list_adjust(config_friends_manager)
 show_friends_manager(config_friends_manager)
 
 
-function init_from_old_fast_login() {
-    if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
-        try {
-            let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
-            eval(str)
-            // console.log(config);
-        }
-        catch (err) {
-            toastLog("读取配置文件出错" + err)
-        }
-    } else {
-        toastLog("读取失败，原快捷登录没有配置文件")
-    }
-    return (config)
-}
-function init_from_easy_login() {
-    if (files.isFile("/sdcard/antForest蚂蚁森林/config_easy_login.js")) {
-        try {
-            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_easy_login.js").read(), 11)
-            config_easy_login = eval('(' + str + ')')
-            config_friends_manager.accounts_list = config_easy_login.accounts_list
-            //log(config_friends_manager.accounts_list)
-        }
-        catch (err) {
-            log("读取配置文件出错" + err)
-        }
-    }
-    else {
-        toastLog("读取失败，没有快捷登录VIP版配置文件")
-    }
-}
-function init_from_water() {
-    if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
-        try {
-            let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
-            eval(str)
-        }
-        catch (err) {
-            toastLog("读取配置文件出错" + err)
-        }
-    } else {
-        toastLog("读取失败，浇水没有配置文件")
-    }
-    return (config)
-}
+
 function accounts_list_generation(config, config_friends_manager) {
     var accounts_list = []
     let numOfAccounts = config_friends_manager.numOfAccounts
@@ -157,6 +104,7 @@ function init_from_file() {
                     // log(remark)
                     account.remark = remark ? remark : ""
                     account.order = i + 1
+                    log(account)
                     accounts_list.push(account)
                 }
                 else {
@@ -317,11 +265,7 @@ function show_friends_manager(config_friends_manager) {
                     </frame>
                     <frame>
                         <vertical >
-                            <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />
-
-                            
-                          
-                            
+                            <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />  
                             <button id="viewlog" text="查看日志" />
                         </vertical>
                     </frame>
@@ -397,14 +341,7 @@ function show_friends_manager(config_friends_manager) {
     initForm2();
 
     ui.add.click(() => {
-        if (config_friends_manager.remainTimes<1) {
-            toastLog("您的次数已用尽")
-            exit()
-        }
-        if (config_friends_manager.deadline - now< 0) {
-            toastLog("您的使用期限已结束")
-            exit()
-        }
+  
         config_friends_manager.opetation = 1
         var res=pre_work()
         saveConfig(dir)
@@ -414,14 +351,7 @@ function show_friends_manager(config_friends_manager) {
         })
     })
     ui.delete.click(() => {
-        if (config_friends_manager.remainTimes < 1) {
-            toastLog("您的次数已用尽")
-            exit()
-        }
-        if (config_friends_manager.deadline - now < 0) {
-            toastLog("您的使用期限已结束")
-            exit()
-        }
+
         config_friends_manager.opetation = 0
         var res=pre_work()
         saveConfig(dir)
@@ -436,118 +366,7 @@ function show_friends_manager(config_friends_manager) {
         saveConfig(dir)
     })
 
-    // ui.copy_imei.click(function () {
-    //     let imei = device.getIMEI()
-    //     setClip(imei)
-    //     toastLog("本机IMEI为" + imei + "，复制成功")
-    // })
-
-    // ui.ok.click(() => {
-    //     // log(ui.initialPassword.text())
-    //     //  var key=uncompile(uncompile(ui.initialPassword.text()+""))
-    //     var key = parseInt(uncompile(uncompile(ui.initialPassword.text() + "", 0), 0))
-    //     key = key + "";
-    //     var t1 = 9, t2 = 13, t3 = 17
-    //     if (key.length == 17) {
-    //         t1 = t1 - 1
-    //         t2 = t2 - 1
-    //         t3 = t3 - 1
-    //     }
-    //     if (key.length == 16) {
-    //         t1 = t1 - 2
-    //         t2 = t2 - 2
-    //         t3 = t3 - 2
-    //     }
-    //     if (key.length == 15) {
-    //         t1 = t1 - 3
-    //         t2 = t2 - 3
-    //         t3 = t3 - 3
-    //     }
-    //     if (key.length == 14) {
-    //         t1 = t1 - 4
-    //         t2 = t2 - 4
-    //         t3 = t3 - 4
-    //     }
-    //     if (key.length == 19) {
-    //         t1 = t1 + 1
-    //         t2 = t2 + 1
-    //         t3 = t3 + 1
-    //     }
-    //     //86611103858332
-    //    // log(key)       
-    //     var date = new Date();
-    //     var now = date.getTime();
-    //     var numOfAccounts = 2*6;
-    //     //log(key.slice(t1, t2))
-    //     //log('t1','t2')
-    //     //log(t1)
-    //    // log(t2)
-    //     //log(numOfAccounts)
-        
-    //     //log(payByMonth)
-    //     //console.log(deadline);
-    //    // aa = parseInt((Math.sin((Math.floor(now / 100000000)) + 19) * 1000000000).toString().slice(0, 9))
-    //     //bb = Imei.slice(6, 15) % 1000000000
-    //     //var key0 = aa + bb + "" + (1001 + parseInt(numberOfAccounts)).toString() + "" + validity + '' + (payByMonth + 0)
-
-    //     var imei = device.getIMEI() + ""
-    //     if (imei.length == 14) {
-    //         imei += "" + 0
-    //     }
-    //     //log(imei)       
-    //     var keywordOfTime = Math.floor(parseInt(key) / 1000000000) - parseInt(imei) % 1000000000
-    //     var keyNow = parseInt(((Math.sin(Math.floor(now / 100000000) + 19)) * 1000000000).toString().slice(0, 9))
-    //     //log(keyNow)
-    //     //log(keywordOfTime)
-
-    //     // log(key.slice(12,15))
-    //     // log(numOfAccounts)
-    //     //   log(keywordOfPrime)
-    //     if (true) {
-    //         toastLog("开始破解")
-    //         var payByMonth = key[t3]
-    //         var imei = device.getIMEI();
-    //         config_friends_manager.imei = imei
-    //         config_friends_manager.numOfAccounts = numOfAccounts
-    //         config_friends_manager.payByMonth = payByMonth
-    //         config_friends_manager.pay=true
-    //         if (true) {
-    //             var deadline = now + 24 * 3600 * 1000 * 7;
-    //             config_friends_manager.deadline=deadline
-    //             config_friends_manager.remainTimes += numOfAccounts*60
-    //         }
-    //         else{
-    //             config_friends_manager.deadline=deadline
-    //             config_friends_manager.remainTimes += numOfAccounts*60
-    //         }
-    //         //log(config_friends_manager)
-    //         saveConfig(dir);
-    //         toastLog("破解成功,重启软件生效!");
-    //     }
-    //     else {
-    //         toastLog("激活码正确")
-    //         var payByMonth = key[t3]
-    //         var imei = device.getIMEI();
-    //         config_friends_manager.imei = imei
-    //         config_friends_manager.numOfAccounts = numOfAccounts
-    //         config_friends_manager.payByMonth = payByMonth
-    //         config_friends_manager.pay=true
-    //         if (true) {
-    //             var deadline = now + 24 * 3600 * 1000 * 7;
-    //             config_friends_manager.deadline=deadline
-    //             config_friends_manager.remainTimes += numOfAccounts*60
-    //         }
-    //         else{
-    //             config_friends_manager.deadline=deadline
-    //             config_friends_manager.remainTimes += numOfAccounts*60
-    //         }
-    //         //log(config_friends_manager)
-    //         saveConfig(dir);
-    //         toastLog("激活成功,重启软件生效!");
-    //     }
-
-    // });
-    // 
+ 
     ui.viewlog.click(() => {
         if (files.isFile("/sdcard/antForest蚂蚁森林/加删好友日志.txt")) {
             app.viewFile("/sdcard/antForest蚂蚁森林/加删好友日志.txt");

@@ -19,13 +19,8 @@ console.setGlobalLogConfig({
 log("================================================================================");
 var date = new Date();
 log(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "自动同步运行日志")
-if ((!config_syn_steps.pay) || (!config_syn_steps.deadline) || now > config_syn_steps.deadline) {
-    config_syn_steps.numOfAccounts = 3
-}
-//toastLog("您的有效期还有" + parseInt((config_syn_steps.deadline - now) / 3600000/24) + "天，请及时联系Mike，以免影响使用")
-if (config_syn_steps.deadline&& (config_syn_steps.deadline-now)/24/3600000<3){
-    toastLog("您的有效期还有" + parseInt(( config_syn_steps.deadline-now) / 3600000)+"小时，请及时联系Mike，以免影响使用")
-}
+
+    config_syn_steps.numOfAccounts = 100
 
 if (!config_syn_steps.accounts_list) {
     init_from_file()
@@ -36,86 +31,6 @@ if (!config_syn_steps.accounts_list) {
 accounts_list_adjust(config_syn_steps)
 show_syn_steps(config_syn_steps)
 
-
-
-function init_from_old_fast_login() {
-    if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
-        try {
-            let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
-            eval(str)
-            // console.log(config);
-        }
-        catch (err) {
-            toastLog("读取配置文件出错" + err)
-        }
-    } else {
-        toastLog("读取失败，原快捷登录没有配置文件")
-    }
-    return (config)
-}
-function init_from_easy_login() {
-    if (files.isFile("/sdcard/antForest蚂蚁森林/config_easy_login.js")) {
-        try {
-            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_easy_login.js").read(), 11)
-            config_easy_login = eval('(' + str + ')')
-            config_syn_steps.accounts_list = config_easy_login.accounts_list
-            //log(config_syn_steps.accounts_list)
-        }
-        catch(err) {
-            log("读取配置文件出错" + err)
-        } 
-    }
-    else{
-        toastLog("读取失败，没有快捷登录VIP版配置文件")
-    }
-}
-
-function init_from_old_water() {
-    if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
-        try {
-            let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
-            eval(str)
-        }
-        catch (err) {
-            toastLog("读取配置文件出错" + err)
-        }
-    } else {
-        toastLog("读取失败，浇水没有配置文件")
-    }
-    return (config)
-}
-function init_from_water() {
-    if (files.isFile("/sdcard/antForest蚂蚁森林/config_water.js")) {
-        try {
-            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_water.js").read(), 11)
-            config_water = eval('(' + str + ')')
-            accounts_list = config_water.accounts_list
-            for (let i = 0; i < accounts_list.length; i++) {
-                let account = accounts_list[i]
-                if (!account.start_position) {
-                    account.start_position = 1
-                }
-                if (!account.end_position) {
-                    account.end_position = 10
-                }
-                if (!account.gnore) {
-                    account.ignore = ""
-                }
-                if (!account.order) {
-                    account.order = i + 1
-                }
-            }
-            config_syn_steps.accounts_list = accounts_list
-            //log(config_water.accounts_list)
-        }
-        catch (err) {
-            log("读取配置文件出错" + err)
-        }
-    }
-    else {
-        toastLog("读取失败，没有新版同步配置文件")
-    }
-}
 function accounts_list_generation(config, config_syn_steps) {
     var accounts_list = []
     let numOfAccounts = config_syn_steps.numOfAccounts
@@ -167,56 +82,57 @@ function init_from_file() {
         }
         catch (err) {
             log("读取配置文件出错" + err)
-        }     
-    } else {
-        if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
-            try {
-                let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
-                eval(str)
-                // console.log(config);
-            }
-            catch (err) {
-                log("读取配置文件出错" + err)
-            }
-        } else if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
-            try {
-                let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
-                eval(str)
-            } catch (error) {
-                log("读取配置文件出错" + err)
-            }
-        }
-        var accounts_list = []
-        //log(config0.options)
-       // config_syn_steps.numOfAccounts = config.numOfAccounts ? config.numOfAccounts : 50
-        let numOfAccounts =config_syn_steps.numOfAccounts
-        //生成accounts_list
-        if (config.options) {
-            let options = config.options
-            for (let i = 0; i < numOfAccounts; i++) {
-                if (options["account" + (i + 1)]) {
-                    let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
-                    let remark = options["remark" + (i + 1)]
-                    // log(remark)
-                    account.remark = remark ? remark : ""
-                    account.order = i + 1
-                    accounts_list.push(account)
-                }
-                else {
-                    let account = { account: "", password: "", remark: "", order: i + 1 }
-                    accounts_list.push(account)
-                }
-            }
+        }  
+    }   
+    // } else {
+    //     if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
+    //         try {
+    //             let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
+    //             eval(str)
+    //             // console.log(config);
+    //         }
+    //         catch (err) {
+    //             log("读取配置文件出错" + err)
+    //         }
+    //     } else if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
+    //         try {
+    //             let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
+    //             eval(str)
+    //         } catch (error) {
+    //             log("读取配置文件出错" + err)
+    //         }
+    //     }
+    //     var accounts_list = []
+    //     //log(config0.options)
+    //    // config_syn_steps.numOfAccounts = config.numOfAccounts ? config.numOfAccounts : 50
+    //     let numOfAccounts =config_syn_steps.numOfAccounts
+    //     //生成accounts_list
+    //     if (config.options) {
+    //         let options = config.options
+    //         for (let i = 0; i < numOfAccounts; i++) {
+    //             if (options["account" + (i + 1)]) {
+    //                 let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
+    //                 let remark = options["remark" + (i + 1)]
+    //                 // log(remark)
+    //                 account.remark = remark ? remark : ""
+    //                 account.order = i + 1
+    //                 accounts_list.push(account)
+    //             }
+    //             else {
+    //                 let account = { account: "", password: "", remark: "", order: i + 1 }
+    //                 accounts_list.push(account)
+    //             }
+    //         }
 
-        } else {
-            for (let i = 0; i < numOfAccounts; i++) {
-                let account = { account: "", password: "", remark: "", order: i + 1 }
-                accounts_list.push(account)
-            }
-        }
-       // log(accounts_list.length)
-        config_syn_steps.accounts_list = accounts_list
-    }
+    //     } else {
+    //         for (let i = 0; i < numOfAccounts; i++) {
+    //             let account = { account: "", password: "", remark: "", order: i + 1 }
+    //             accounts_list.push(account)
+    //         }
+    //     }
+    //    // log(accounts_list.length)
+    //     config_syn_steps.accounts_list = accounts_list
+    // }
 }
 
 function accounts_list_adjust(config_syn_steps) {
@@ -353,15 +269,7 @@ function show_syn_steps(config_syn_steps) {
                         <vertical >
                             <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />
 
-                            <text textSize="16sp" textColor="#000000" text="请点击下方的复制IMEI按钮，粘贴发送给Mike(微信1289713124)获取激活码" />
-                            <button id="copy_imei" text="复制IMEI" />
-                            <input id="initialPassword" hint="请输入激活码" w="500" text="" />
-                            <button id="ok" text="确定" />
-                            <button id="init_from_easy_login" text="从快捷登录VIP版导入数据" />
-                            <button id="init_from_water" text="从自动浇水5.x导入数据" />
-                            <button id="init_from_old_fast_login" text="从旧版快捷登陆导入数据" />
-                            <button id="init_from_old_water" text="从旧版自动浇水导入数据" />
-                            <button id="init_from_myself" text="从自身配置文件导入数据" />
+                
                             <horizontal gravity="center">
                                 <button id="viewlog" text="查看日志" />
                                 <button id="clear_log" text="清除日志" />
@@ -454,162 +362,7 @@ function show_syn_steps(config_syn_steps) {
        // ui.button_list.setDataSource(remark_list);
         saveConfig(dir)
     })
-    
-    ui.copy_imei.click(function () {
-        let imei = device.getIMEI()
-        setClip(imei)
-        toastLog("本机IMEI为" + imei + "，复制成功")
-    })
 
-    ui.ok.click(() => {
-        // log(ui.initialPassword.text())
-        //  var key=uncompile(uncompile(ui.initialPassword.text()+""))
-        var key = parseInt(uncompile(uncompile(ui.initialPassword.text() + "", 0), 0))
-        key = key + "";
-        var t1 = 9, t2 = 12, t3 = 15
-        if (key.length == 14) {
-            t1 = t1 - 1
-            t2 = t2 - 1
-            t3 = t3 - 1
-        }
-        if (key.length == 13) {
-            t1 = t1 - 2
-            t2 = t2 - 2
-            t3 = t3 - 2
-        }
-        if (key.length == 12) {
-            t1 = t1 - 3
-            t2 = t2 - 3
-            t3 = t3 - 3
-        }
-        if (key.length == 11) {
-            t1 = t1 - 4
-            t2 = t2 - 4
-            t3 = t3 - 4
-        }
-        if (key.length == 16) {
-            t1 = t1 + 1
-            t2 = t2 + 1
-            t3 = t3 + 1
-        }
-        //86611103858332
-        //     log(key)       
-        var date = new Date();
-        var now = date.getTime();
-        var numOfAccounts = (parseInt(key.slice(t1, t2) - 101) * 2);
-        //log(numOfAccounts)
-        var deadline = now + 24 * 3600 * 1000 * parseInt(key.slice(t2, t3));
-        //log("deadline")
-        console.log((deadline-now)/3600000/24);
-
-        var imei = device.getIMEI() + ""
-        if (imei.length == 14) {
-            imei += "" + 0
-        }
-        //log(imei)       
-        var keywordOfTime = Math.floor(key / 1000000) - imei % 1000000000
-        var keyNow = parseInt(((Math.sin(Math.floor(now / 100000000) + 17)) * 1000000000).toString().slice(0, 9))
-        // log(keyNow)
-
-        // log(key.slice(12,15))
-        // log(numOfAccounts)
-        //   log(keywordOfPrime)
-        if (Math.abs(keywordOfTime - keyNow) < 10) {
-            var imei = device.getIMEI();
-            config_syn_steps.imei = imei
-            config_syn_steps.numOfAccounts = numOfAccounts
-            config_syn_steps.pay = true
-            console.log(config_syn_steps.pay);
-
-            config_syn_steps.deadline = deadline
-            toastLog("激活码正确")
-            log("config_syn_steps.deadline" + config_syn_steps.deadline)
-            saveConfig(dir);
-            toastLog("激活成功,重启软件生效!");
-        }
-        else {
-            toastLog("激活码不正确，请联系Mike（微信1289713124）")
-        }
-
-    });
-    ui.init_from_old_fast_login.click(() => {
-        config = init_from_old_fast_login()
-        accounts_list_generation(config, config_syn_steps)
-        accounts_list_adjust(config_syn_steps)
-        let accounts_list = config_syn_steps.accounts_list
-       // let remark_list = remark_list_update(config_syn_steps)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-        try {
-            files.copy("/sdcard/alipay/multimedia/config3.js", "/sdcard/antForest蚂蚁森林/config3.js")
-        } catch (e) {
-            log(e)
-        }
-    })
-
-    ui.init_from_water.click(() => {
-        init_from_water()
-        // accounts_list_generation(config, config_easy_login)
-        accounts_list_adjust(config_syn_steps)
-        let accounts_list = config_syn_steps.accounts_list
-        //let remark_list = remark_list_update(config_easy_login)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-    })   
-    ui.init_from_old_water.click(() => {
-        config = init_from_old_water()
-        accounts_list_generation(config, config_syn_steps)
-        accounts_list_adjust(config_syn_steps)
-        let accounts_list = config_syn_steps.accounts_list
-        //let remark_list = remark_list_update(config_syn_steps)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-        try {
-            files.copy("/sdcard/alipay/multimedia/config.js", "/sdcard/antForest蚂蚁森林/config.js")
-        } catch (e) {
-            log(e)
-        }
-    })
-    ui.init_from_easy_login.click(() => {
-        init_from_easy_login()
-       // accounts_list_generation(config, config_syn_steps)
-        accounts_list_adjust(config_syn_steps)
-        let accounts_list = config_syn_steps.accounts_list
-        //let remark_list = remark_list_update(config_syn_steps)
-        ui.list.setDataSource(accounts_list);
-        //ui.button_list.setDataSource(remark_list);
-        saveConfig(dir);
-        toastLog("导入数据成功")
-    })
-    ui.init_from_myself.click(() => {
-        if (files.isFile(dir)) {
-            try {
-                var str = uncompile(open(dir).read(), 11)
-                let config_syn_steps_file = eval('(' + str + ')')
-                let imei_file = config_syn_steps_file.imei ? config_syn_steps_file.imei:"imei"
-                if (imei_file==device.getIMEI()){
-                    config_syn_steps = config_syn_steps_file
-                }
-                else{
-                    config_syn_steps.accounts_list = config_syn_steps_file.accounts_list
-                    accounts_list_adjust(config_syn_steps)
-                }
-                let accounts_list=config_syn_steps.accounts_list
-                ui.list.setDataSource(accounts_list);
-                saveConfig(dir);
-                toastLog("导入数据成功")
-            }
-            catch (err) {
-                log("读取配置文件出错" + err)
-            }
-        }   
-    })
 
 
     ui.viewlog.click(()=>{
@@ -669,7 +422,7 @@ function uncompile(code, num) {
     return c;
 }
 
-//////浇水函数部分：
+
 ///函数部分
 function work(config_syn_steps) {
 
