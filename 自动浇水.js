@@ -6,6 +6,7 @@ const IMEI=device.getIMEI()+''
 const ratio=device.width/1080
 var date = new Date();
 var now = date.getTime();
+var sdkversion=device.sdkInt;
 const waterButton={x:993*ratio,y:1506*ratio}
 var day = storage.get("day") ? storage.get("day") : null
 if (date.getDate() != day) {
@@ -574,7 +575,7 @@ function water_one_account(account) {
     var obj = idMatches(/.*(h5_tv_|tab_description).*/).findOne()
     if (obj.id().indexOf("h5_tv_") > -1 || obj.id().indexOf("back") > -1) {
         sleep(1000)
-        back()
+        mback()
         sleep(1000)
     }
     var my = idContains("tab_description").text("我的").findOne(2000);
@@ -621,7 +622,7 @@ function takeMyPower(numberTakePower, start_position, end_position){
         //click(device.width/2,y)
         //press(device.width / 2, y, duration)
         sleep(1000 * timeDetect / 2)
-        back();
+        mback();
         sleep(500)
         text("首页").findOne()
         enterForeast(1)
@@ -721,7 +722,7 @@ function water_in_rank_list(start_position,end_position,non_list){
 ///三次浇水动作
 function water(yi,is_end) {
     //press(device.width / 5 * 4, yi, duration);  
-    click(device.width / 5 * 4, yi)
+    mclick(device.width / 5 * 4, yi)
    // toastLog("点击x:" + device.width / 5 * 4 + "点击x:" +yi)
   //  var obj = descMatches(/你收取TA|你给TA助力/).findOne(10000)
     /*
@@ -773,7 +774,7 @@ function water(yi,is_end) {
         //clickCenter(water_button)
         //log("点击浇水")
        // click(waterButton.x, waterButton.y)
-        click(waterButton.x, waterButton.y)
+       mclick(waterButton.x, waterButton.y)
         // waterButton.click()    
         //  clickCenter(waterButton)                                                                                 
         waterTimes += 1;
@@ -806,7 +807,7 @@ function water(yi,is_end) {
             break;     
         }
     }
-    back();
+    mback();
     textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
     sleep(1000 * speed);
     return waterPowerPerson;
@@ -833,7 +834,7 @@ function water2(yi,is_end) {
     outermost:
     for (var waterTimes = 0; waterTimes < 3; waterTimes++) {     
         //press(device.width / 5 * 4, yi, duration);
-        click(device.width / 5 * 4, yi)
+        mclick(device.width / 5 * 4, yi)
         //    sleep(100) 
         //      click(device.width /5*4,yi)             
         //  var waterButton=desc("浇水").findOne(10000);   
@@ -843,7 +844,7 @@ function water2(yi,is_end) {
       //  descContains("我的大树养成记录").findOne(5000)
         while (!obj) {
             //press(device.width / 5 * 4, yi, duration);
-            click(device.width / 5 * 4, yi)
+            mclick(device.width / 5 * 4, yi)
             boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
             var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(10000)
             //let water_button = desc("浇水").findOne(10000)
@@ -858,19 +859,19 @@ function water2(yi,is_end) {
             kkk += 1;
             //water_button.click()
             //clickCenter(water_button)   
-            click(waterButton.x, waterButton.y)
+            mclick(waterButton.x, waterButton.y)
             var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3 ).descMatches(/\d+g/).findOne(1000)
             var power1 = obj ? parseInt(obj.contentDescription) : 0
             //   log("第"+kkk+"次点击能量为"+power1)
             if (power1 - power0 == 10) {
                 break;
             }
-            click(waterButton.x, waterButton.y)
+            mclick(waterButton.x, waterButton.y)
            // clickCenter(water_button)
             //water_button.click()
             //      sleep(100* speed)
             if (to.indexOf("今日浇水已到达") > -1) {
-                back();
+                mback();
                 sleep(2000)
                 watered = true
                 break outermost;
@@ -894,7 +895,7 @@ function water2(yi,is_end) {
         if(kkk < 20){
             waterPowerPerson += 10;
         }
-        back();
+        mback();
         // descMatches(/.*g|t/).boundsInside(0.8*device.width,device.height/2,device.width,device.height).findOne(1500)
         //  sleep(500)        
         textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
@@ -923,7 +924,7 @@ function swipeToObj(selector) {
         obj = sel.findOnce();
         j += 1;
         if (j % 15 == 0) {
-            back();
+            mback();
             sleep(2000)
             enterForeast()
             desc("合种").findOne(20000)
@@ -953,7 +954,7 @@ function takePower(numberTakePower) {
             //   filters[i].click()       
             //      log("点击第"+i)
             if (id("com.alipay.mobile.ui:id/title_bar_title").exists()) {
-                back();
+                mback();
                 sleep(1500);
             }
         }
@@ -966,7 +967,7 @@ function takePower(numberTakePower) {
     if (len > 0) {
         var selector1 = idContains("_close")
         if (selector1.findOne(1500)) {
-            back();
+            mback();
             text("首页").findOne(2000)
             app.startActivity({
                 data: "alipayqr://platformapi/startapp?saId=60000002"
@@ -999,7 +1000,11 @@ function getPower() {
 
 function clickCenter(obj) {
     let b = obj.bounds()
-    return (click(b.centerX(), b.centerY()))
+    if (sdkversion>23){
+        return (click(b.centerX(), b.centerY()))
+    }else{
+        return (Tap(b.centerX(), b.centerY()))
+    }
 }
 
 function enterForeast(sel) {
@@ -1155,4 +1160,19 @@ function uncompile(code, num) {
         c += String.fromCharCode(code.charCodeAt(i) - c.charCodeAt(i - 1) - num);
     }
     return c;
+}
+function mback(){
+    
+    if (sdkversion>23){
+        return back();
+    }else{
+        return Back();
+    }
+}
+function mclick(x,y){
+    if (sdkversion>23){
+        return click(x,y);
+    }else{
+        return Tap(x,y);
+    }
 }

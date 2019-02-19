@@ -1,3 +1,4 @@
-var sh = new Shell(true);
-sh.exec("svc wifi enable")
-sh.exitAndWaitFor();
+app.startActivity(app.intent({
+    action: "VIEW",
+    data: "alipayqr://platformapi/startapp?appId=20000008",
+}));

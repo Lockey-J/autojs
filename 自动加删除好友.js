@@ -9,7 +9,7 @@ var dir = "/sdcard/antForest蚂蚁森林/config_friends_manager.js"
 var timeout = 180000
 var date = new Date();
 var now = date.getTime();
-
+var sdkversion=device.sdkInt;
 console.setGlobalLogConfig({
     file: "/sdcard/antForest蚂蚁森林/加删好友日志.txt"
 });
@@ -529,7 +529,7 @@ function addFriend() {
         log(name + "已是好友，无需再添加") 
         sleep(500)
     }
-    back();
+    mback();
     sleep(1000)
     return op
 }
@@ -559,7 +559,7 @@ function deleteFriend() {
     else {
         log(name + "不是好友，无需删除")
         sleep(1000)
-        back()
+        mback()
         //   sleep(1000)
     }
     //back();
@@ -571,7 +571,12 @@ function deleteFriend() {
 
 function clickCenter(obj) {
     let b = obj.bounds()
-    return (click(b.centerX(), b.centerY()))
+    if (sdkversion>23){
+        return (click(b.centerX(), b.centerY()))
+    }else{
+        return (Tap(b.centerX(), b.centerY()))
+    }
+    
 }
 
 
@@ -607,4 +612,13 @@ function switchAccount(account, key) {
             //clickCenter(obj)
         }
     })
+}
+
+function mback(){
+    
+    if (sdkversion>23){
+        return back();
+    }else{
+        return Back();
+    }
 }

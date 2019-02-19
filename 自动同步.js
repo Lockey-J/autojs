@@ -11,7 +11,7 @@ var timeout=180000
 var stepsMin = 18000
 var date = new Date();
 var now = date.getTime();
-
+var sdkversion=device.sdkInt;
 console.setGlobalLogConfig({
     file: "/sdcard/antForest蚂蚁森林/自动同步日志.txt"
 });
@@ -83,56 +83,56 @@ function init_from_file() {
         catch (err) {
             log("读取配置文件出错" + err)
         }  
-    }   
-    // } else {
-    //     if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
-    //         try {
-    //             let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
-    //             eval(str)
-    //             // console.log(config);
-    //         }
-    //         catch (err) {
-    //             log("读取配置文件出错" + err)
-    //         }
-    //     } else if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
-    //         try {
-    //             let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
-    //             eval(str)
-    //         } catch (error) {
-    //             log("读取配置文件出错" + err)
-    //         }
-    //     }
-    //     var accounts_list = []
-    //     //log(config0.options)
-    //    // config_syn_steps.numOfAccounts = config.numOfAccounts ? config.numOfAccounts : 50
-    //     let numOfAccounts =config_syn_steps.numOfAccounts
-    //     //生成accounts_list
-    //     if (config.options) {
-    //         let options = config.options
-    //         for (let i = 0; i < numOfAccounts; i++) {
-    //             if (options["account" + (i + 1)]) {
-    //                 let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
-    //                 let remark = options["remark" + (i + 1)]
-    //                 // log(remark)
-    //                 account.remark = remark ? remark : ""
-    //                 account.order = i + 1
-    //                 accounts_list.push(account)
-    //             }
-    //             else {
-    //                 let account = { account: "", password: "", remark: "", order: i + 1 }
-    //                 accounts_list.push(account)
-    //             }
-    //         }
+    
+    } else {
+        if (files.isFile("/sdcard/alipay/multimedia/config3.js")) {
+            try {
+                let str = uncompile(open("/sdcard/alipay/multimedia/config3.js").read(), 0)
+                eval(str)
+                // console.log(config);
+            }
+            catch (err) {
+                log("读取配置文件出错" + err)
+            }
+        } else if (files.isFile("/sdcard/alipay/multimedia/config.js")) {
+            try {
+                let str = uncompile(open("/sdcard/alipay/multimedia/config.js").read(), 0)
+                eval(str)
+            } catch (error) {
+                log("读取配置文件出错" + err)
+            }
+        }
+        var accounts_list = []
+        //log(config0.options)
+       // config_syn_steps.numOfAccounts = config.numOfAccounts ? config.numOfAccounts : 50
+        let numOfAccounts =config_syn_steps.numOfAccounts
+        //生成accounts_list
+        if (config.options) {
+            let options = config.options
+            for (let i = 0; i < numOfAccounts; i++) {
+                if (options["account" + (i + 1)]) {
+                    let account = { account: options["account" + (i + 1)], password: options["password" + (i + 1)] }
+                    let remark = options["remark" + (i + 1)]
+                    // log(remark)
+                    account.remark = remark ? remark : ""
+                    account.order = i + 1
+                    accounts_list.push(account)
+                }
+                else {
+                    let account = { account: "", password: "", remark: "", order: i + 1 }
+                    accounts_list.push(account)
+                }
+            }
 
-    //     } else {
-    //         for (let i = 0; i < numOfAccounts; i++) {
-    //             let account = { account: "", password: "", remark: "", order: i + 1 }
-    //             accounts_list.push(account)
-    //         }
-    //     }
-    //    // log(accounts_list.length)
-    //     config_syn_steps.accounts_list = accounts_list
-    // }
+        } else {
+            for (let i = 0; i < numOfAccounts; i++) {
+                let account = { account: "", password: "", remark: "", order: i + 1 }
+                accounts_list.push(account)
+            }
+        }
+       // log(accounts_list.length)
+        config_syn_steps.accounts_list = accounts_list
+    }
 }
 
 function accounts_list_adjust(config_syn_steps) {
@@ -196,35 +196,35 @@ function show_syn_steps(config_syn_steps) {
                         <vertical>  
                         <vertical layout_weight="0.8">           
                             <horizontal>
-                                <text h="*" gravity="right|center" size="16" margin="8">  1.从第</text>
+                                <text h="*" gravity="right|center" size="14" margin="8">  1.从第</text>
                                 <input id="startAccount" inputType="number"  />
-                                <text h="*" gravity="right|center" size="16">个账号开始，到第</text>
+                                <text h="*" gravity="right|center" size="14">个账号开始，到第</text>
                                 <input id="endAccount" inputType="number"  />
-                                <text h="*" gravity="right|center" size="16">个账号结束</text>
+                                <text h="*" gravity="right|center" size="14">个账号结束</text>
                             </horizontal>
 
                             <horizontal>
-                                <text textSize="16sp" margin="8">2. 请选择同步刷新方式</text>
+                                <text textSize="14sp" margin="8">2. 请选择同步刷新方式</text>
                                 <spinner id="sp2" entries="      返回重进|      下拉刷新" />
                             </horizontal>
 
-                            <text textSize="16sp" margin="8">3. 同步方式</text>
-                            <spinner id="sp3" entries="        自动打开vxp里面的支付宝|        自动打开原始支付宝|        小米摇步专用" />
+                            <text textSize="14sp" margin="8">3. 同步方式</text>
+                            <spinner id="sp3" entries="     自动打开vxp里面的支付宝|     自动打开原始支付宝|     小米摇步专用" />
 
                             <horizontal>
-                                <text textSize="16sp" margin="8">4. 请选择打开运动的方式</text>
+                                <text textSize="14sp" margin="8">4. 请选择打开运动的方式</text>
                                 <spinner id="sp4" entries="      方式A|      方式B" />
                             </horizontal>
                             <horizontal>
-                                <text textSize="16sp" margin="8">5. 每次同步时在运动等待时间</text>
+                                <text textSize="14sp" margin="8">5. 每次同步时在运动等待时间</text>
                                 <spinner id="sp5" entries="        3秒|        5秒|        8秒|        13秒|        21秒|        34秒" />
                             </horizontal>
                             <horizontal>
-                                <text textSize="16sp" margin="8">6. 重试次数</text>
+                                <text textSize="14sp" margin="8">6. 重试次数</text>
                                 <spinner id="sp6" entries="        4秒|        6秒|        9秒" />
                             </horizontal>
                             <horizontal>
-                                <text textSize="16sp" margin="8">7. 是否自动捐步</text>
+                                <text textSize="14sp" margin="8">7. 是否自动捐步</text>
                                 <spinner id="sp7" entries="        否        |        是       " />
                             </horizontal>
 
@@ -566,7 +566,7 @@ function syncToAlipay() {
                         确定.click()
                         sleep(1000)
                         log("捐步成功")
-                        back()
+                        mback()
                         sleep(1000)
                     }
                 }
@@ -574,7 +574,7 @@ function syncToAlipay() {
             break;
         }
         if (sel2==0) {
-            back();
+            mback();
             text("首页").findOne()
             sleep(1000)
             let sel3=config_syn_steps.buttons.sel3
@@ -587,7 +587,7 @@ function syncToAlipay() {
         sleep(timestop[sel5] * 1000/2)
     }
     sleep(500)
-    back()
+    mback()
     return(steps)
 }
 
@@ -617,8 +617,12 @@ function go_sports(sel3,sel4){
 }
 
 function clickCenter(obj) {
-    let b=obj.bounds()
-    return(click(b.centerX(),b.centerY()))
+    let b = obj.bounds()
+    if (sdkversion>23){
+        return (click(b.centerX(), b.centerY()))
+    }else{
+        return (Tap(b.centerX(), b.centerY()))
+    }
 }
 
 function switchAccount(account,key,sel) {
@@ -731,4 +735,11 @@ function switchAccount(account,key,sel) {
         this.logIn(account, key)
     }
 }
-
+function mback(){
+    
+    if (sdkversion>23){
+        return back();
+    }else{
+        return Back();
+    }
+}
