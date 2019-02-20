@@ -637,6 +637,21 @@ function switchAccount(account,key,sel) {
         idContains("loginButton").findOne().click()
         text("首页").findOne()
     }
+    this.logInRoot = function (account, key) {
+        idContains("nextButton").waitFor()
+        setText(0, account);
+        idContains("nextButton").findOne().click()
+        idContains("loginButton").waitFor()
+        setText(0, account);
+        sleep(100);
+        setText(1, key);
+        //   log("设置密码")
+        sleep(100);
+        setText(0, account);
+        idContains("loginButton").findOne().click()
+        textMatches(/首页|关闭/).findOne()
+    }
+ 
     if(sel==0) {
         var my = idContains("tab_description").text("我的").findOne();
         my.parent().click()
@@ -722,17 +737,31 @@ function switchAccount(account,key,sel) {
         }   
     }
     else{
-        app.startActivity(app.intent({
-            action: "VIEW",
-            data: "alipayqr://platformapi/startapp?appId=20000008",
-        }));
-        threads.start(function () {
-            obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(5000)
-            click("密码登录")
-            click("换个验证方式")
-            click("换个方式登录")
-        })
-        this.logIn(account, key)
+        if(sdkversion>23){
+            app.startActivity(app.intent({
+                action: "VIEW",
+                data: "alipayqr://platformapi/startapp?appId=20000008",
+            }));
+        }else{
+            app.startActivity({
+                packageName: "com.eg.android.AlipayGphone",
+                className: "com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity",
+                root:true
+                });
+        }
+      
+        // threads.start(function () {
+        //     obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(4000)
+        //     click("密码登录")
+        //     click("换个验证方式")
+        //     click("换个方式登录")
+        // })
+        if(sdkversion>23){
+            this.logIn(account, key)
+        }else{
+            this.logInRoot(account, key)
+        }
+        
     }
 }
 function mback(){

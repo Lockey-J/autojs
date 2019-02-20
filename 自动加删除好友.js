@@ -30,7 +30,38 @@ if (!config_friends_manager.accounts_list) {
 accounts_list_adjust(config_friends_manager)
 show_friends_manager(config_friends_manager)
 
-
+function init_from_syn_steps() {
+    if (files.isFile("/sdcard/antForest蚂蚁森林/config_syn_steps.js")) {
+        try {
+            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_syn_steps.js").read(), 11)
+            config_easy_login = eval('(' + str + ')')
+            accounts_list = config_easy_login.accounts_list
+            for (let i = 0; i < accounts_list.length; i++) {
+                let account = accounts_list[i]
+                if (!account.start_position) {
+                    account.start_position = 1
+                }
+                if (!account.end_position) {
+                    account.end_position = 10
+                }
+                if (!account.gnore) {
+                    account.ignore = ""
+                }
+                if (!account.order) {
+                    account.order = i + 1
+                }
+            }
+            config_friends_manager.accounts_list = accounts_list
+            //log(config_water.accounts_list)
+        }
+        catch (err) {
+            log("读取配置文件出错" + err)
+        }
+    }
+    else {
+        toastLog("读取失败，没有新版同步配置文件")
+    }
+}
 
 function accounts_list_generation(config, config_friends_manager) {
     var accounts_list = []
@@ -266,6 +297,7 @@ function show_friends_manager(config_friends_manager) {
                     <frame>
                         <vertical >
                             <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />  
+                            <button id="init_from_syn_steps" text="从新版自动同步导入数据" />
                             <button id="viewlog" text="查看日志" />
                         </vertical>
                     </frame>
@@ -365,7 +397,17 @@ function show_friends_manager(config_friends_manager) {
         // ui.button_list.setDataSource(remark_list);
         saveConfig(dir)
     })
-
+    ui.init_from_syn_steps.click(() => {
+        init_from_syn_steps()
+        // accounts_list_generation(config, config_friends_manager)
+        accounts_list_adjust(config_friends_manager)
+        let accounts_list = config_friends_manager.accounts_list
+        //let remark_list = remark_list_update(config_water)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+    })
  
     ui.viewlog.click(() => {
         if (files.isFile("/sdcard/antForest蚂蚁森林/加删好友日志.txt")) {
@@ -592,17 +634,45 @@ function switchAccount(account, key) {
         idContains("loginButton").findOne().click()
         textMatches(/首页|关闭/).findOne()
     }
-    app.startActivity(app.intent({
-        action: "VIEW",
-        data: "alipayqr://platformapi/startapp?appId=20000008",
-    }));
-    threads.start(function () {
-        obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(4000)
-        click("密码登录")
-        click("换个验证方式")
-        click("换个方式登录")
-    })
-    this.logIn(account, key)
+    this.logInRoot = function (account, key) {
+        idContains("nextButton").waitFor()
+        setText(0, account);
+        idContains("nextButton").findOne().click()
+        idContains("loginButton").waitFor()
+        setText(0, account);
+        sleep(100);
+        setText(1, key);
+        //   log("设置密码")
+        sleep(100);
+        setText(0, account);
+        idContains("loginButton").findOne().click()
+        textMatches(/首页|关闭/).findOne()
+    }
+    if(sdkversion>23){
+        app.startActivity(app.intent({
+            action: "VIEW",
+            data: "alipayqr://platformapi/startapp?appId=20000008",
+        }));
+    }else{
+        app.startActivity({
+            packageName: "com.eg.android.AlipayGphone",
+            className: "com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity",
+            root:true
+            });
+    }
+  
+    // threads.start(function () {
+    //     obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(4000)
+    //     click("密码登录")
+    //     click("换个验证方式")
+    //     click("换个方式登录")
+    // })
+    if(sdkversion>23){
+        this.logIn(account, key)
+    }else{
+        this.logInRoot(account, key)
+    }
+    
     threads.start(function () {
         //var obj=desc("下次再说").findOne(10000)
         var obj = text("自助解限").findOne(10000)

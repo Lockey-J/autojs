@@ -1,4 +1,1 @@
-app.startActivity(app.intent({
-    action: "VIEW",
-    data: "alipayqr://platformapi/startapp?appId=20000008",
-}));
+Tap(device.width / 5 * 4, 313.5*device.width/1080)

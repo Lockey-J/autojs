@@ -55,7 +55,38 @@ accounts_list_adjust(config_water)
 //log(config_water)
 show_water(config_water)
 
-
+function init_from_syn_steps() {
+    if (files.isFile("/sdcard/antForest蚂蚁森林/config_syn_steps.js")) {
+        try {
+            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_syn_steps.js").read(), 11)
+            config_easy_login = eval('(' + str + ')')
+            accounts_list = config_easy_login.accounts_list
+            for (let i = 0; i < accounts_list.length; i++) {
+                let account = accounts_list[i]
+                if (!account.start_position) {
+                    account.start_position = 1
+                }
+                if (!account.end_position) {
+                    account.end_position = 10
+                }
+                if (!account.gnore) {
+                    account.ignore = ""
+                }
+                if (!account.order) {
+                    account.order = i + 1
+                }
+            }
+            config_water.accounts_list = accounts_list
+            //log(config_water.accounts_list)
+        }
+        catch (err) {
+            log("读取配置文件出错" + err)
+        }
+    }
+    else {
+        toastLog("读取失败，没有新版同步配置文件")
+    }
+}
 
 function accounts_list_generation(config, config_water) {
     var accounts_list = []
@@ -267,7 +298,7 @@ function show_water(config_water) {
                     <frame>
                         <vertical >
                             <text id="page3" text="第三页内容" textColor="#000000" textSize="16sp" />
-                                              
+                            <button id="init_from_syn_steps" text="从新版自动同步导入数据" />  
                            <horizontal gravity="center">
                                 <button id="viewlog" text="查看日志" />
                                 <button id="clear_log" text="清除日志"  />
@@ -393,7 +424,17 @@ function show_water(config_water) {
           // ui.button_list.setDataSource(remark_list);
            saveConfig(dir)
     })
-    
+    ui.init_from_syn_steps.click(() => {
+        init_from_syn_steps()
+        // accounts_list_generation(config, config_water)
+        accounts_list_adjust(config_water)
+        let accounts_list = config_water.accounts_list
+        //let remark_list = remark_list_update(config_water)
+        ui.list.setDataSource(accounts_list);
+        //ui.button_list.setDataSource(remark_list);
+        saveConfig(dir);
+        toastLog("导入数据成功")
+    })
    
     ui.viewlog.click(() => {
         if (files.isFile("/sdcard/antForest蚂蚁森林/自动浇水日志.txt")) {
@@ -721,6 +762,7 @@ function water_in_rank_list(start_position,end_position,non_list){
 
 ///三次浇水动作
 function water(yi,is_end) {
+    log("water")
     //press(device.width / 5 * 4, yi, duration);  
     mclick(device.width / 5 * 4, yi)
    // toastLog("点击x:" + device.width / 5 * 4 + "点击x:" +yi)
@@ -750,7 +792,7 @@ function water(yi,is_end) {
     var waterTimes = 0;
     var waterPowerPerson = 0;
     threads.start(function () {
-        selector1 = descContains("继续浇水")
+        selector1 = descContains("浇水")
         if (close1 = selector1.findOne(7000)) {
             sleep(500);
             waterTimes += 1
@@ -781,7 +823,7 @@ function water(yi,is_end) {
         sleep(500)
         var obj = boundsInside(0, 0, device.width, device.width / 1080 * 1920 / 3).descMatches(/\d+g/).findOne(1000)
         var power1 = obj ? parseInt(obj.contentDescription) : 0
-        //   log("第"+kkk+"次点击能量为"+power1)
+         log("第"+kkk+"次点击能量为"+power1)
         if (power1 - power0 >= 30) {
             waterPowerPerson = power1 - power0
             break;
@@ -792,7 +834,7 @@ function water(yi,is_end) {
             waterPowerPerson = power1 - power0
             break;
         }
-        if (to.indexOf("今日浇水已到达") > -1) {
+        if (to.indexOf("上限") > -1) {
             //     sleep(1500)
             waterPowerPerson = power1 - power0
             // waterPowerPerson=30
@@ -814,10 +856,12 @@ function water(yi,is_end) {
 }
 
 function water2(yi,is_end) {
+    log("water2")
+    var finishWater=threads.disposable();
     var waterTimes = 0;
     var waterPowerPerson = 0
     threads.start(function () {
-        selector1 = descContains("继续浇水")
+        selector1 = descContains("浇水")
         if (close1 = selector1.findOne(7000)) {
             sleep(200 * speed);
             close1.click();
@@ -828,7 +872,9 @@ function water2(yi,is_end) {
     threads.start(function () {
         events.observeToast();
         events.onToast(function (toast) {
-            to = toast.getText()+"初始"
+            if (frompackage=="com.eg.android.AlipayGphone"){
+                to=toast.getText();
+            }
         });
     })
     outermost:
@@ -852,7 +898,7 @@ function water2(yi,is_end) {
         }
         var obj = boundsInside(0, 0, 1080*ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
         var power0 = obj ? parseInt(obj.contentDescription) : 0
-        //   log("初始能量为"+power0)             
+         log("初始能量为"+power0)             
         var kkk = 0
         while (kkk < 20) {
             //    times1=desc(myname).find().size()
@@ -862,7 +908,7 @@ function water2(yi,is_end) {
             mclick(waterButton.x, waterButton.y)
             var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3 ).descMatches(/\d+g/).findOne(1000)
             var power1 = obj ? parseInt(obj.contentDescription) : 0
-            //   log("第"+kkk+"次点击能量为"+power1)
+             log("第"+kkk+"次点击能量为"+power1)
             if (power1 - power0 == 10) {
                 break;
             }
@@ -870,8 +916,9 @@ function water2(yi,is_end) {
            // clickCenter(water_button)
             //water_button.click()
             //      sleep(100* speed)
-            if (to.indexOf("今日浇水已到达") > -1) {
+            if (to.indexOf("上限") > -1) {
                 mback();
+                descContains("返回").findOne(2000).click();
                 sleep(2000)
                 watered = true
                 break outermost;
@@ -1046,6 +1093,20 @@ function switchAccount(account, key, sel) {
         idContains("loginButton").findOne().click()
         text("首页").findOne()
     }
+    this.logInRoot = function (account, key) {
+        idContains("nextButton").waitFor()
+        setText(0, account);
+        idContains("nextButton").findOne().click()
+        idContains("loginButton").waitFor()
+        setText(0, account);
+        sleep(100);
+        setText(1, key);
+        //   log("设置密码")
+        sleep(100);
+        setText(0, account);
+        idContains("loginButton").findOne().click()
+        textMatches(/首页|关闭/).findOne()
+    }
     if (sel == 0) {
         var my = idContains("tab_description").text("我的").findOne();
         my.parent().click()
@@ -1131,17 +1192,30 @@ function switchAccount(account, key, sel) {
         }
     }
     else {
-        app.startActivity(app.intent({
-            action: "VIEW",
-            data: "alipayqr://platformapi/startapp?appId=20000008",
-        }));
-        threads.start(function () {
-            obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(5000)
-            click("密码登录")
-            click("换个验证方式")
-            click("换个方式登录")
-        })
-        this.logIn(account, key)
+        if(sdkversion>23){
+            app.startActivity(app.intent({
+                action: "VIEW",
+                data: "alipayqr://platformapi/startapp?appId=20000008",
+            }));
+        }else{
+            app.startActivity({
+                packageName: "com.eg.android.AlipayGphone",
+                className: "com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity",
+                root:true
+                });
+        }
+      
+        // threads.start(function () {
+        //     obj = textMatches("换个验证方式|密码登录|换个方式登录").findOne(4000)
+        //     click("密码登录")
+        //     click("换个验证方式")
+        //     click("换个方式登录")
+        // })
+        if(sdkversion>23){
+            this.logIn(account, key)
+        }else{
+            this.logInRoot(account, key)
+        }
     }
 }
 
