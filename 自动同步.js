@@ -1,6 +1,6 @@
 "ui";
 //storages.remove("syn_steps")
-
+auto();
 var storage = storages.create("syn_steps")
 var config_syn_steps = storage.get("config_syn_steps", {})
 
@@ -65,7 +65,7 @@ function accounts_list_generation(config, config_syn_steps) {
 function init_from_file() {
     if (files.isFile(dir)) {
         try {
-            var str = uncompile(open(dir).read(), 11)
+            var str = open(dir).read()
             let config_syn_steps_file = eval('(' + str + ')')
             let imei_file = config_syn_steps_file.imei ? config_syn_steps_file.imei : "imei"
             if (imei_file == device.getIMEI()) {
@@ -213,7 +213,7 @@ function show_syn_steps(config_syn_steps) {
 
                             <horizontal>
                                 <text textSize="14sp" margin="8">4. 请选择打开运动的方式</text>
-                                <spinner id="sp4" entries="      方式A|      方式B" />
+                                <spinner id="sp4" entries="      直接跳转|      首页点击运动" />
                             </horizontal>
                             <horizontal>
                                 <text textSize="14sp" margin="8">5. 每次同步时在运动等待时间</text>
@@ -396,7 +396,7 @@ function saveConfig(dir) {
     try {
         files.ensureDir(dir)
         var file = open(dir, "w");
-        file.write(compile(str, 11));
+        file.write(str);
         file.close();
         toastLog("保存设置成功")
     }

@@ -58,7 +58,7 @@ show_water(config_water)
 function init_from_syn_steps() {
     if (files.isFile("/sdcard/antForest蚂蚁森林/config_syn_steps.js")) {
         try {
-            var str = uncompile(open("/sdcard/antForest蚂蚁森林/config_syn_steps.js").read(), 11)
+            var str = open("/sdcard/antForest蚂蚁森林/config_syn_steps.js").read()
             config_easy_login = eval('(' + str + ')')
             accounts_list = config_easy_login.accounts_list
             for (let i = 0; i < accounts_list.length; i++) {
@@ -124,7 +124,7 @@ function init_from_file() {
     if (files.isFile(dir)) {
         try {
             
-            var str = uncompile(open(dir).read(), 11)
+            var str = open(dir).read()
             config_water_file = eval('(' + str + ')')
             if (IMEI == config_water_file.imei){
                 config_water = config_water_file
@@ -249,7 +249,7 @@ function show_water(config_water) {
                             </horizontal-->
                             <horizontal>
                             <text textSize="16sp" margin="8">5. 进入森林方式</text>
-                            <spinner id="sp5" entries="        直接跳转|通过首页蚂蚁森林" />
+                            <spinner id="sp5" entries="        直接跳转|        通过首页蚂蚁森林" />
                             </horizontal>
                         </vertical> 
                             <vertical>
@@ -414,7 +414,8 @@ function show_water(config_water) {
             config_water.buttons["sel" + i] = ui["sp" + i].getSelectedItemPosition()
         }
         storage.put("config_water", config_water)
-        threads.shutDownAll()
+        threads.shutDownAll();
+        // log("线程开始")
         threads.start(function () {
             work(config_water)
         })
@@ -477,6 +478,7 @@ function show_water(config_water) {
             }
             ui.list.setDataSource(config_water.accounts_list);
             //log(config_water.accounts_list)
+           
             saveConfig(dir);
             toastLog("批量设置成功")
         }
@@ -499,7 +501,7 @@ function saveConfig(dir) {
     try {
         files.ensureDir(dir)
         var file = open(dir, "w");
-        file.write(compile(str, 11));
+        file.write(str);
         file.close();
         toastLog("保存设置成功")
     }
@@ -823,7 +825,7 @@ function water(yi,is_end) {
         sleep(500)
         var obj = boundsInside(0, 0, device.width, device.width / 1080 * 1920 / 3).descMatches(/\d+g/).findOne(1000)
         var power1 = obj ? parseInt(obj.contentDescription) : 0
-         log("第"+kkk+"次点击能量为"+power1)
+         log("第"+waterTimes+"次点击能量为"+power1)
         if (power1 - power0 >= 30) {
             waterPowerPerson = power1 - power0
             break;
@@ -856,23 +858,23 @@ function water(yi,is_end) {
 }
 
 function water2(yi,is_end) {
-    log("water2")
+    
     var finishWater=threads.disposable();
     var waterTimes = 0;
     var waterPowerPerson = 0
-    threads.start(function () {
-        selector1 = descContains("浇水")
-        if (close1 = selector1.findOne(7000)) {
-            sleep(200 * speed);
-            close1.click();
-        }
-    })
+    // threads.start(function () {
+    //     selector1 = descContains("浇水")
+    //     if (close1 = selector1.findOne(7000)) {
+    //         sleep(200 * speed);
+    //         close1.click();
+    //     }
+    // })
     var to = "初始";
     //点击浇水直至出现+10g动画
     threads.start(function () {
         events.observeToast();
         events.onToast(function (toast) {
-            if (frompackage=="com.eg.android.AlipayGphone"){
+            if (toast.getPackageName()=="com.eg.android.AlipayGphone"){
                 to=toast.getText();
             }
         });
@@ -881,13 +883,9 @@ function water2(yi,is_end) {
     for (var waterTimes = 0; waterTimes < 3; waterTimes++) {     
         //press(device.width / 5 * 4, yi, duration);
         mclick(device.width / 5 * 4, yi)
-        //    sleep(100) 
-        //      click(device.width /5*4,yi)             
-        //  var waterButton=desc("浇水").findOne(10000);   
-        // var obj=descMatches(/你收取TA|你给TA助力/).findOne(10000) 
-        //let water_button = desc("浇水").findOne(10000)
+      
         var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(10000)
-      //  descContains("我的大树养成记录").findOne(5000)
+     
         while (!obj) {
             //press(device.width / 5 * 4, yi, duration);
             mclick(device.width / 5 * 4, yi)
@@ -899,51 +897,73 @@ function water2(yi,is_end) {
         var obj = boundsInside(0, 0, 1080*ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
         var power0 = obj ? parseInt(obj.contentDescription) : 0
          log("初始能量为"+power0)             
-        var kkk = 0
-        while (kkk < 20) {
-            //    times1=desc(myname).find().size()
+      var kkk=0;
+        while (!watered) {
+          
             kkk += 1;
-            //water_button.click()
-            //clickCenter(water_button)   
+          
+            sleep(2000)
             mclick(waterButton.x, waterButton.y)
             var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3 ).descMatches(/\d+g/).findOne(1000)
             var power1 = obj ? parseInt(obj.contentDescription) : 0
              log("第"+kkk+"次点击能量为"+power1)
-            if (power1 - power0 == 10) {
-                break;
-            }
+            // if (power1 - power0 == 10) {
+            //     break;
+            // }
             mclick(waterButton.x, waterButton.y)
            // clickCenter(water_button)
             //water_button.click()
             //      sleep(100* speed)
             if (to.indexOf("上限") > -1) {
                 mback();
-                descContains("返回").findOne(2000).click();
+                // descContains("返回").findOne(2000).click();
+                
                 sleep(2000)
                 watered = true
-                break outermost;
+                finishWater.setAndNotify(1);
+                events.removeAllListeners();
+                break ;
             }
             if (to.indexOf("能量不足") > -1) {
                 let sel2=config_water.buttons.sel2
+                log(sel2)
+                // watered = true
+                // finishWater.setAndNotify(1);
+                events.removeAllListeners();
                 //if(sel2==7){
                 if (0) {
-                    takeMyPower(1);
+
+                    // enterForeast(1);
+                    takePower(1);
                     enterRankList()
+                    break ;
                 }
                 else{
                     sleep(1500)
                     console.error("能量不足，后面都漏水")
                     is_end[0] = true
-                    break outermost;
+                    break ;
                 }    
             }
         }
         // times0=times0
-        if(kkk < 20){
-            waterPowerPerson += 10;
-        }
+        var waitWater=finishWater.blockedGet();
+        // log("线程返回："+waitWater);
+        if (waitWater=1) { 
+            if (to.indexOf("上限")>-1) {        
+                descContains("返回").findOne(2000).click();
+                to="初始"
+                
+            };       
+        };
+        next:
+        // if(kkk < 20){
+        //     waterPowerPerson += 10;
+        // }
         mback();
         // descMatches(/.*g|t/).boundsInside(0.8*device.width,device.height/2,device.width,device.height).findOne(1500)
+        // var power2 = obj ? parseInt(obj.contentDescription) : 0
+        waterPowerPerson=power1-power0
         //  sleep(500)        
         textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
         sleep(500 * speed)
@@ -981,6 +1001,7 @@ function swipeToObj(selector) {
 
 function takePower(numberTakePower) {
     console.hide()
+    
     var start0 = getPower();
     var start = start0
     descContains("收集能量").findOne(2000)
@@ -1056,9 +1077,10 @@ function clickCenter(obj) {
 
 function enterForeast(sel) {
     if (sel) {
-        app.startActivity({
-            data: "alipayqr://platformapi/startapp?saId=60000002"
-        })
+        app.startActivity({        
+            action: "VIEW",
+            data: "alipays://platformapi/startapp?appId=60000002"    
+        });
         desc("合种").findOne()
     }
     else {

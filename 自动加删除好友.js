@@ -97,7 +97,7 @@ function accounts_list_generation(config, config_friends_manager) {
 function init_from_file() {
     if (files.isFile(dir)) {
         try {
-            var str = uncompile(open(dir).read(), 11)
+            var str = open(dir).read()
             config_friends_manager = eval('(' + str + ')')
         }
         catch (err) {
@@ -427,7 +427,7 @@ function show_friends_manager(config_friends_manager) {
         try {
             files.ensureDir(dir)
             var file = open(dir, "w");
-            file.write(compile(str, 11));
+            file.write(str);
             file.close();
             toastLog("保存设置成功")
         }
