@@ -685,7 +685,7 @@ function water_in_rank_list(start_position,end_position,non_list){
     //log("进入")
     sleep(2000)
     var NameList={}
-    let speed=1
+    let speed=0.8
     let y1=313.5*ratio
     let dy = 191 * ratio
     let sel3=config_water.buttons.sel3
@@ -717,7 +717,7 @@ function water_in_rank_list(start_position,end_position,non_list){
                 // scrollDown()
                 sleep(1000 * speed);
                 var yi = desc(i).findOne().bounds().centerY();
-                sleep(500 * speed)
+                // sleep(500 * speed)
             }
             if (i < start_position) {
                 continue;
@@ -880,7 +880,7 @@ function water2(yi,is_end) {
         });
     })
     outermost:
-    for (var waterTimes = 0; waterTimes < 3; waterTimes++) {     
+    // for (var waterTimes = 0; waterTimes < 3; waterTimes++) {     
         //press(device.width / 5 * 4, yi, duration);
         mclick(device.width / 5 * 4, yi)
       
@@ -902,29 +902,33 @@ function water2(yi,is_end) {
           
             kkk += 1;
           
-            sleep(2000)
+            sleep(1500)
             mclick(waterButton.x, waterButton.y)
             var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3 ).descMatches(/\d+g/).findOne(1000)
             var power1 = obj ? parseInt(obj.contentDescription) : 0
              log("第"+kkk+"次点击能量为"+power1)
-            // if (power1 - power0 == 10) {
-            //     break;
-            // }
+            if (power1 - power0 >= 30) {
+                watered = true               
+                descContains("返回").findOne(2000).click();
+                to="初始"  
+                events.removeAllListeners();
+                break;
+            }
             mclick(waterButton.x, waterButton.y)
            // clickCenter(water_button)
             //water_button.click()
             //      sleep(100* speed)
             if (to.indexOf("上限") > -1) {
                 mback();
-                // descContains("返回").findOne(2000).click();
-                
-                sleep(2000)
+                // descContains("返回").findOne(2000).click();               
+               
                 watered = true
                 finishWater.setAndNotify(1);
                 events.removeAllListeners();
                 break ;
             }
             if (to.indexOf("能量不足") > -1) {
+                watered=true;
                 let sel2=config_water.buttons.sel2
                 log(sel2)
                 // watered = true
@@ -947,27 +951,28 @@ function water2(yi,is_end) {
             }
         }
         // times0=times0
-        var waitWater=finishWater.blockedGet();
+     
         // log("线程返回："+waitWater);
-        if (waitWater=1) { 
-            if (to.indexOf("上限")>-1) {        
+        if  (to.indexOf("上限") > -1) {          
                 descContains("返回").findOne(2000).click();
-                to="初始"
-                
-            };       
+                to="初始"               
+            
         };
-        next:
+        
         // if(kkk < 20){
         //     waterPowerPerson += 10;
         // }
-        mback();
+        if(!descMatches(/环保证书/).exists()){
+            mback();
+        }
+        
         // descMatches(/.*g|t/).boundsInside(0.8*device.width,device.height/2,device.width,device.height).findOne(1500)
         // var power2 = obj ? parseInt(obj.contentDescription) : 0
         waterPowerPerson=power1-power0
         //  sleep(500)        
-        textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
-        sleep(500 * speed)
-    }
+        descMatches(/环保证书/).findOne(2000)
+        // sleep(100 * speed)
+    // }
     return waterPowerPerson;
 }
 
@@ -1112,6 +1117,27 @@ function switchAccount(account, key, sel) {
         //   log("设置密码")
         sleep(100);
         setText(0, account);
+        //   log("设置密码")
+        sleep(100);
+        setText(1, key);
+        var isInput=false;
+        while(isInput){
+            var maccount=idContains("id/content").classNameContains("android.widget.EditText").find().get(0).text();
+            var mkey=idContains("id/content").classNameContains("android.widget.EditText").find().get(1).text();
+            if(maccount==account & key==mkey ){
+                isInput=true;
+                break;
+            }
+            else{
+                if(maccount!=account){
+                    setText(0, account);
+                }
+                if(key!=mkey){
+                    setText(1, key);
+                }
+            }
+            sleep(500);
+        }
         idContains("loginButton").findOne().click()
         text("首页").findOne()
     }
@@ -1125,7 +1151,26 @@ function switchAccount(account, key, sel) {
         setText(1, key);
         //   log("设置密码")
         sleep(100);
-        setText(0, account);
+      
+        var isInput=false;
+        while(isInput){
+            var maccount=idContains("id/content").classNameContains("android.widget.EditText").find().get(0).text();
+            var mkey=idContains("id/content").classNameContains("android.widget.EditText").find().get(1).text();
+            if(maccount==account & key==mkey ){
+                isInput=true;
+                break;
+            }
+            else{
+                if(maccount!=account){
+                    setText(0, account);
+                }
+                if(key!=mkey){
+                    setText(1, key);
+                }
+            }
+            sleep(500);
+        }
+      
         idContains("loginButton").findOne().click()
         textMatches(/首页|关闭/).findOne()
     }

@@ -1,1 +1,2 @@
-Tap(device.width / 5 * 4, 313.5*device.width/1080)
+var te=idContains("id/content").classNameContains("android.widget.EditText").find().get(0).text()
+log(te)
