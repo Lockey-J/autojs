@@ -237,7 +237,7 @@ function show_water(config_water) {
                                 <spinner id="sp2" entries="            不收|             1个|             2个|             3个|             4个|             5个|             6个|           " />
                             <horizontal>
                             <text textSize="16sp" margin="8">3. 请选择浇水版本</text>
-                            <spinner id="sp3" entries="             极速版|             快速版" />
+                            <spinner id="sp3" entries="             极速版" />
                             </horizontal>
                             <horizontal>
                             <text textSize="16sp" margin="8">4. 请选择检测弹窗的时间</text>
@@ -763,99 +763,99 @@ function water_in_rank_list(start_position,end_position,non_list){
 
 
 ///三次浇水动作
-function water(yi,is_end) {
-    log("water")
-    //press(device.width / 5 * 4, yi, duration);  
-    mclick(device.width / 5 * 4, yi)
-   // toastLog("点击x:" + device.width / 5 * 4 + "点击x:" +yi)
-  //  var obj = descMatches(/你收取TA|你给TA助力/).findOne(10000)
-    /*
-    while (!obj) {
-        //      var selector=desc("5")
-        //    swipeToObj(selector)
-        //    click(device.width /5*4,yi);
-        press(device.width / 5 * 4, yi, duration);
-        // var waterButton=desc("浇水").findOne(10000);
-        var obj = descMatches(/你收取TA|你给TA助力/).findOne(10000)
-    }*/
-    //let water_button=desc("浇水").findOne()
-   // log("找到浇水")
-    var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(20000)
-    while (!obj) {
-        press(device.width / 5 * 4, yi, duration);
-        //click(device.width / 5 * 4, yi)
-        boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
-        var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(10000)
-        //let water_button = desc("浇水").findOne(10000)
-        //descContains("我的大树养成记录").findOne(5000)
-    }
-    var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
-    var power0 = obj ? parseInt(obj.contentDescription) : 0
-    var waterTimes = 0;
-    var waterPowerPerson = 0;
-    threads.start(function () {
-        selector1 = descContains("浇水")
-        if (close1 = selector1.findOne(7000)) {
-            sleep(500);
-            waterTimes += 1
-            close1.click();
-        }
-    })
-    //点击浇水直至出现+10g动画
-    outermost:
-    while (1) {
-        Timeout2 = 0;
-        var to = "初始";
-        threads.start(function () {
-            events.observeToast();
-            events.onToast(function (toast) {
-                to = toast.getText()+"初始"
-            });
-        })
+// function water(yi,is_end) {
+//     log("water")
+//     //press(device.width / 5 * 4, yi, duration);  
+//     mclick(device.width / 5 * 4, yi)
+//    // toastLog("点击x:" + device.width / 5 * 4 + "点击x:" +yi)
+//   //  var obj = descMatches(/你收取TA|你给TA助力/).findOne(10000)
+//     /*
+//     while (!obj) {
+//         //      var selector=desc("5")
+//         //    swipeToObj(selector)
+//         //    click(device.width /5*4,yi);
+//         press(device.width / 5 * 4, yi, duration);
+//         // var waterButton=desc("浇水").findOne(10000);
+//         var obj = descMatches(/你收取TA|你给TA助力/).findOne(10000)
+//     }*/
+//     //let water_button=desc("浇水").findOne()
+//    // log("找到浇水")
+//     var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(20000)
+//     while (!obj) {
+//         press(device.width / 5 * 4, yi, duration);
+//         //click(device.width / 5 * 4, yi)
+//         boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
+//         var obj = idContains("h5_tv_title").textContains("的蚂蚁森林").findOne(10000)
+//         //let water_button = desc("浇水").findOne(10000)
+//         //descContains("我的大树养成记录").findOne(5000)
+//     }
+//     var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3).descMatches(/\d+g/).findOne(1000)
+//     var power0 = obj ? parseInt(obj.contentDescription) : 0
+//     var waterTimes = 0;
+//     var waterPowerPerson = 0;
+//     threads.start(function () {
+//         selector1 = descContains("浇水")
+//         if (close1 = selector1.findOne(7000)) {
+//             sleep(500);
+//             waterTimes += 1
+//             close1.click();
+//         }
+//     })
+//     //点击浇水直至出现+10g动画
+//     outermost:
+//     while (1) {
+//         Timeout2 = 0;
+//         var to = "初始";
+//         threads.start(function () {
+//             events.observeToast();
+//             events.onToast(function (toast) {
+//                 to = toast.getText()+"初始"
+//             });
+//         })
 
-        //water_button.click()
+//         //water_button.click()
         
-        //clickCenter(water_button)
-        //log("点击浇水")
-       // click(waterButton.x, waterButton.y)
-       mclick(waterButton.x, waterButton.y)
-        // waterButton.click()    
-        //  clickCenter(waterButton)                                                                                 
-        waterTimes += 1;
-        sleep(500)
-        var obj = boundsInside(0, 0, device.width, device.width / 1080 * 1920 / 3).descMatches(/\d+g/).findOne(1000)
-        var power1 = obj ? parseInt(obj.contentDescription) : 0
-         log("第"+waterTimes+"次点击能量为"+power1)
-        if (power1 - power0 >= 30) {
-            waterPowerPerson = power1 - power0
-            break;
-        }
-        if (waterTimes >= 25) {
-            //sleep(1000*speed)
-            //  log("退出")
-            waterPowerPerson = power1 - power0
-            break;
-        }
-        if (to.indexOf("上限") > -1) {
-            //     sleep(1500)
-            waterPowerPerson = power1 - power0
-            // waterPowerPerson=30
-            //    sleep(1000)
-            watered = true
-            break;
-        }
-        if (to.indexOf("能量不足") > -1) {
-            sleep(1500)
-            console.error("能量不足，后面都漏水")
-            is_end[0]=true
-            break;     
-        }
-    }
-    mback();
-    textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
-    sleep(1000 * speed);
-    return waterPowerPerson;
-}
+//         //clickCenter(water_button)
+//         //log("点击浇水")
+//        // click(waterButton.x, waterButton.y)
+//        mclick(waterButton.x, waterButton.y)
+//         // waterButton.click()    
+//         //  clickCenter(waterButton)                                                                                 
+//         waterTimes += 1;
+//         sleep(500)
+//         var obj = boundsInside(0, 0, device.width, device.width / 1080 * 1920 / 3).descMatches(/\d+g/).findOne(1000)
+//         var power1 = obj ? parseInt(obj.contentDescription) : 0
+//          log("第"+waterTimes+"次点击能量为"+power1)
+//         if (power1 - power0 >= 30) {
+//             waterPowerPerson = power1 - power0
+//             break;
+//         }
+//         if (waterTimes >= 25) {
+//             //sleep(1000*speed)
+//             //  log("退出")
+//             waterPowerPerson = power1 - power0
+//             break;
+//         }
+//         if (to.indexOf("上限") > -1) {
+//             //     sleep(1500)
+//             waterPowerPerson = power1 - power0
+//             // waterPowerPerson=30
+//             //    sleep(1000)
+//             watered = true
+//             break;
+//         }
+//         if (to.indexOf("能量不足") > -1) {
+//             sleep(1500)
+//             console.error("能量不足，后面都漏水")
+//             is_end[0]=true
+//             break;     
+//         }
+//     }
+//     mback();
+//     textMatches(/好友排行榜|蚂蚁森林/).findOne(2000)
+//     sleep(1000 * speed);
+//     return waterPowerPerson;
+// }
 
 function water2(yi,is_end) {
     
@@ -875,7 +875,9 @@ function water2(yi,is_end) {
         events.observeToast();
         events.onToast(function (toast) {
             if (toast.getPackageName()=="com.eg.android.AlipayGphone"){
+
                 to=toast.getText();
+                watered=true;
             }
         });
     })
@@ -902,8 +904,18 @@ function water2(yi,is_end) {
           
             kkk += 1;
           
-            sleep(1500)
+    
             mclick(waterButton.x, waterButton.y)
+            sleep(1500);
+            if (watered){
+                // log("判断watered跳出")
+                watered = true               
+                descContains("返回").findOne(2000).click();
+              
+                events.removeAllListeners();
+                
+                break;
+            }
             var obj = boundsInside(0, 0, 1080 * ratio, ratio * 1920 / 3 ).descMatches(/\d+g/).findOne(1000)
             var power1 = obj ? parseInt(obj.contentDescription) : 0
              log("第"+kkk+"次点击能量为"+power1)
@@ -914,55 +926,57 @@ function water2(yi,is_end) {
                 events.removeAllListeners();
                 break;
             }
-            mclick(waterButton.x, waterButton.y)
+
+            // mclick(waterButton.x, waterButton.y)
            // clickCenter(water_button)
             //water_button.click()
             //      sleep(100* speed)
-            if (to.indexOf("上限") > -1) {
-                mback();
-                // descContains("返回").findOne(2000).click();               
-               
-                watered = true
-                finishWater.setAndNotify(1);
-                events.removeAllListeners();
-                break ;
-            }
-            if (to.indexOf("能量不足") > -1) {
-                watered=true;
-                let sel2=config_water.buttons.sel2
-                log(sel2)
-                // watered = true
-                // finishWater.setAndNotify(1);
-                events.removeAllListeners();
-                //if(sel2==7){
-                if (0) {
-
-                    // enterForeast(1);
-                    takePower(1);
-                    enterRankList()
-                    break ;
-                }
-                else{
-                    sleep(1500)
-                    console.error("能量不足，后面都漏水")
-                    is_end[0] = true
-                    break ;
-                }    
-            }
+            
         }
         // times0=times0
-     
+        if (to.indexOf("上限") > -1) {
+            mback();
+            // descContains("返回").findOne(2000).click();               
+           
+            watered = true
+            finishWater.setAndNotify(1);
+           
+            // break ;
+        }
+        if (to.indexOf("能量不足") > -1) {
+            watered=true;
+            let sel2=config_water.buttons.sel2
+            log(sel2)
+            // watered = true
+            // finishWater.setAndNotify(1);
+          
+            //if(sel2==7){
+            if (0) {
+
+                // enterForeast(1);
+                takePower(1);
+                enterRankList()
+                // break ;
+            }
+            else{
+                sleep(1500)
+                console.error("能量不足，后面都漏水")
+                is_end[0] = true
+                // break ;
+            }    
+        }
         // log("线程返回："+waitWater);
-        if  (to.indexOf("上限") > -1) {          
-                descContains("返回").findOne(2000).click();
-                to="初始"               
+        // if  (to.indexOf("上限") > -1) {          
+        //         descContains("返回").findOne(2000).click();
+        //         to="初始"               
             
-        };
+        // };
         
         // if(kkk < 20){
         //     waterPowerPerson += 10;
         // }
-        if(!descMatches(/环保证书/).exists()){
+        descMatches(/^((?!环保证书).)+/).findOne(3000)
+        if(!descMatches(/^((?!环保证书).)+/).exists()){
             mback();
         }
         
@@ -970,7 +984,7 @@ function water2(yi,is_end) {
         // var power2 = obj ? parseInt(obj.contentDescription) : 0
         waterPowerPerson=power1-power0
         //  sleep(500)        
-        descMatches(/环保证书/).findOne(2000)
+        descMatches(/^((?!环保证书).)+/).findOne(2000)
         // sleep(100 * speed)
     // }
     return waterPowerPerson;
